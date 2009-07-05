@@ -1,0 +1,387 @@
+<project name="IntensiBuild" default="build">
+
+    <!-- Determine root of build system. -->
+    <dirname property="dir.intensibuild" file="${ant.file.IntensiBuild}"/>
+
+    <!-- Load values from the project root folder. -->
+    <property file="release.properties"/>
+    <property file="build.properties"/>
+    <property file="env.properties"/>
+
+    <!-- Set fallback defaults to make IntelliJ happy and have a proper configuration. -->
+    <property name="screen.size" value="Default"/>
+    <property name="project.name" value="${ant.project.name}"/>
+    <property name="release.configurations" value=""/>
+
+    <!-- Load the build defaults. -->
+    <property file="${dir.intensibuild}/build_defaults.properties"/>
+
+    <!-- Show some debugging output. -->
+    <echo message="WTK HOME: ${wtk.home}"/>
+    <echo message="PROJECT NAME: ${project.name}"/>
+
+
+
+    <macrodef name="increment_version">
+        <attribute name="file" default="version.properties"/>
+        <attribute name="part" default="build"/>
+        <sequential>
+            <exec executable="ruby" failonerror="true" failifexecutionfails="true">
+                <arg value="-I${dir.intensibuild}/scripts"/>
+                <arg value="${dir.intensibuild}/scripts/increment_version.rb"/>
+                <arg value="@{file}"/>
+                <arg value="@{part}"/>
+            </exec>
+        </sequential>
+    </macrodef>
+
+
+    
+    <taskdef resource="antenna.properties" classpath="${dir.env.libraries}/antenna-bin-0.9.13-psychocell.jar"/>
+    <taskdef resource="proguard/ant/task.properties" classpath="${dir.env.libraries}/proguard-4.3.jar"/>
+    <taskdef resource="junit/task.properties"
+             classpath="${dir.env.libraries}/junit-3.8.1.jar;${dir.env.libraries}/ant-junit.jar"/>
+
+    <taskdef name="junit" classname="org.apache.tools.ant.taskdefs.optional.junit.JUnitTask">
+        <classpath>
+            <pathelement location="${dir.env.junit}/ant-junit.jar"/>
+            <pathelement location="${dir.env.junit}/junit-3.8.1.jar"/>
+        </classpath>
+    </taskdef>
+
+    
+
+    <path id="classpath.libraries">
+        <fileset id="libraries" dir="${dir.libraries}" includes="*.jar"/>
+    </path>
+
+    <path id="classpath.build">
+        <path refid="classpath.libraries"/>
+        <pathelement location="${dir.build.classes}"/>
+    </path>
+
+    <path id="classpath.test">
+        <pathelement location="${dir.env.junit}/junit-3.8.1.jar"/>
+        <pathelement location="${dir.build.tests}"/>
+        <pathelement location="${dir.tests}"/>
+        <path refid="classpath.build"/>
+    </path>
+
+
+
+    <target name="_init">
+        <mkdir dir="${dir.build}"/>
+        <mkdir dir="${dir.build.dist}"/>
+        <mkdir dir="${dir.build.tests}"/>
+        <mkdir dir="${dir.build.runme}"/>
+        <mkdir dir="${dir.build.classes}"/>
+        <mkdir dir="${dir.build.obfuscated}"/>
+        <mkdir dir="${dir.build.preverified}"/>
+        <mkdir dir="${dir.release}"/>
+    </target>
+
+    <target name="_build_sources" depends="_init">
+        <increment_version part="KEEP THE SAME"/>
+
+        <property file="version.properties"/>
+        <property name="version" value="1.1.1"/>
+        <property name="date" value="UNKNOWN"/>
+
+        <echo message="Defined symbols: ${defined_symbols}"/>
+        <wtkpreprocess srcdir="${dir.mod.core}/${dir.sources}" symbols="${defined_symbols}" destdir="${dir.build.sources}"/>
+        <wtkpreprocess srcdir="${dir.sources}" symbols="${defined_symbols}" destdir="${dir.build.sources}"/>
+    </target>
+
+    <target name="_build_classes" depends="_build_sources">
+        <wtkbuild source="1.3" target="1.3" srcdir="${dir.build.sources}"
+                  destdir="${dir.build.classes}" preverify="false"
+                  debug="false" cldc="${wtk.cldc.version}"
+                  classpathref="classpath.build"/>
+    </target>
+
+    <target name="_build_release">
+        <exec executable="ruby" failonerror="true" failifexecutionfails="true">
+            <arg value="-I${dir.intensibuild}/scripts"/>
+            <arg value="${dir.intensibuild}/scripts/release.rb"/>
+            <arg line="${release.configurations}"/>
+        </exec>
+    </target>
+
+    <target name="_build_tests" depends="_build_classes">
+        <javac srcdir="${dir.tests}" destdir="${dir.build.tests}" debug="true" classpathref="classpath.test"
+                target="1.5" source="1.5" />
+    </target>
+
+    <target name="_build_runme" depends="_build_classes">
+        <javac srcdir="${dir.runme.sources}" destdir="${dir.build.classes}" debug="true"
+               classpathref="classpath.build" target="1.5" source="1.5"/>
+        <jar file="${dir.release}/RunME.jar">
+            <fileset dir="${dir.build.classes}" includes="**/*"/>
+        </jar>
+    </target>
+
+    <target name="_run_tests" depends="_build_tests,_build_runme">
+        <!-- This needs RunME to provide all the emulation classes for the MIDP APIs. -->
+        <!-- That's why _build_runme is called as a dependency. -->
+        <dirname property="project.home" file="${ant.file}"/>
+        <mkdir dir="${dir.release}/junit"/>
+        <junit printsummary="yes" haltonfailure="yes" showoutput="true" dir="${project.home}">
+            <classpath refid="classpath.test"/>
+            <formatter type="brief" usefile="false"/>
+            <formatter type="xml" usefile="true"/>
+            <batchtest fork="yes" todir="${dir.release}/junit">
+                <fileset dir="${dir.tests}">
+                    <include name="**/Test*.java"/>
+                    <include name="**/*Test.java"/>
+                </fileset>
+            </batchtest>
+        </junit>
+    </target>
+
+    <target name="_obfuscate">
+        <proguard optimize="true" shrink="true" defaultpackage=""
+                  printmapping="false" verbose="false"
+                  usemixedcaseclassnames="false" obfuscate="${obfuscate}"
+                  overloadaggressively="true" printseeds="false"
+                  allowaccessmodification="true" microedition="true">
+            <injar dir="${dir.build.classes}"/>
+            <outjar dir="${dir.build.obfuscated}"/>
+            <libraryjar>
+                <pathelement path="${wtk.midpapi}"/>
+            </libraryjar>
+            <keep name="*" extends="javax.microedition.midlet.MIDlet">
+                <method name="*"/>
+            </keep>
+            <keep name="*" extends="net.intensicode.game.objects.Particle">
+                <method name="*"/>
+            </keep>
+        </proguard>
+    </target>
+
+    <target name="_preverify">
+        <wtkpreverify cldc="${cldc_version}" srcdir="${dir.build.obfuscated}" destdir="${dir.build.preverified}"/>
+    </target>
+
+    <target name="_make_jad_properties">
+        <echoproperties destfile="${jad.file}.properties" failonerror="true"/>
+        <replaceregexp byline="true" file="${jad.properties}" match="(.*)=(.*)" replace="{\1}=\2"/>
+        <replaceregexp byline="true" file="${jad.properties}" match="(.*)=(.*)" replace="$\1=\2"/>
+    </target>
+
+    <target name="_update_jad">
+        <copy file="${jad.template}" tofile="${jad.file}" overwrite="true"/>
+        <antcall target="_make_jad_properties"/>
+        <replace replacefilterfile="${jad.properties}" file="${jad.file}"/>
+        <delete file="${jad.properties}"/>
+        <wtkjad jadfile="${jad.file}" name="${project.name}" vendor="${vendor.name}" autoversion="false" update="true">
+            <attribute name="MicroEdition-Configuration" value="CLDC-${cldc_version}"/>
+            <attribute name="MicroEdition-Profile" value="MIDP-${midp_version}"/>
+            <attribute name="MIDlet-Name" value="${project.name}"/>
+        </wtkjad>
+        <exec executable="ruby" failonerror="true" failifexecutionfails="true">
+            <arg value="-I${dir.intensibuild}/scripts"/>
+            <arg value="${dir.intensibuild}/scripts/merge_manifest.rb"/>
+            <arg value="${jad.file}"/>
+            <arg value="${manifest_additions}"/>
+        </exec>
+    </target>
+
+    <target name="_update_jad_with_size">
+        <copy file="${jad.template}" tofile="${jad.file}" overwrite="true"/>
+        <antcall target="_make_jad_properties"/>
+        <replace replacefilterfile="${jad.properties}" file="${jad.file}"/>
+        <delete file="${jad.properties}"/>
+        <wtkjad jadfile="${jad.file}" jarfile="${jar.file}" name="${project.name}" vendor="${vendor.name}"
+                autoversion="false" update="true">
+            <attribute name="MicroEdition-Configuration" value="CLDC-${cldc_version}"/>
+            <attribute name="MicroEdition-Profile" value="MIDP-${midp_version}"/>
+            <attribute name="MIDlet-Name" value="${project.name}"/>
+        </wtkjad>
+        <exec executable="ruby" failonerror="true" failifexecutionfails="true">
+            <arg value="-I${dir.intensibuild}/scripts"/>
+            <arg value="${dir.intensibuild}/scripts/merge_manifest.rb"/>
+            <arg value="${jad.file}"/>
+            <arg value="${manifest_additions}"/>
+        </exec>
+    </target>
+
+    <target name="_package_midlet" depends="_build_sources,_build_classes">
+        <unjar dest="${dir.build.classes}">
+            <fileset refid="libraries"/>
+        </unjar>
+        <antcall target="_obfuscate"/>
+        <antcall target="_preverify"/>
+
+        <antcall target="_update_jad"/>
+
+        <jar jarfile="${jar.file}" manifest="${jad.file}">
+            <fileset dir="${dir.build.preverified}"/>
+            <fileset dir="${dir.resources.root}">
+                <include name="*"/>
+                <include name="sound/*${target.sound_suffix}"/>
+                <include name="music/*${target.music_suffix}"/>
+            </fileset>
+            <fileset dir="${dir.resources.target}">
+                <include name="*"/>
+                <include name="sound/*${target.sound_suffix}"/>
+                <include name="music/*${target.music_suffix}"/>
+            </fileset>
+            <fileset dir="${dir.resources.target}/${screen.size}">
+                <include name="*"/>
+                <include name="sound/*${target.sound_suffix}"/>
+                <include name="music/*${target.music_suffix}"/>
+            </fileset>
+        </jar>
+
+        <!-- Update again to set MIDlet-Jar-Size attribute. -->
+        <antcall target="_update_jad_with_size"/>
+    </target>
+
+    <target name="_sign_jar">
+        <property file="${dir.intensibuild}/signing_defaults.properties"/>
+        <signjar alias="${signing.alias}" storepass="${signing.storepass}"
+                 keystore="${signing.keystore}" jar="${jar.runme}"/>
+    </target>
+
+    <target name="_package_runme" depends="_build_runme">
+        <unjar dest="${dir.build.classes}">
+            <fileset refid="libraries"/>
+        </unjar>
+
+        <delete file="${jar.runme}" failonerror="false"/>
+        <jar jarfile="${jar.runme}" duplicate="preserve">
+            <fileset dir="deploy" includes="runme.properties"/>
+            <fileset dir="${dir.build.classes}"/>
+            <fileset dir="${dir.resources.root}">
+                <include name="*"/>
+                <include name="sound/*${target.sound_suffix}"/>
+                <include name="music/*${target.music_suffix}"/>
+            </fileset>
+            <fileset dir="${dir.resources.target}">
+                <include name="*"/>
+                <include name="sound/*${target.sound_suffix}"/>
+                <include name="music/*${target.music_suffix}"/>
+            </fileset>
+            <fileset dir="${dir.resources.target}/${screen.size}">
+                <include name="*"/>
+                <include name="sound/*${target.sound_suffix}"/>
+                <include name="music/*${target.music_suffix}"/>
+            </fileset>
+            <manifest>
+                <attribute name="Main-Class" value="${main.class}"/>
+            </manifest>
+        </jar>
+
+        <antcall target="_sign_jar"/>
+
+        <copy todir="${dir.build.runme}">
+            <fileset dir="deploy" includes="**/*"/>
+            <fileset dir="deploy" includes="**/.htaccess"/>
+        </copy>
+    </target>
+
+    <target name="_package_distribution">
+        <zip destfile="${zip.file.distribution}">
+            <fileset dir=".">
+                <include name="**/*"/>
+                <exclude name="**/.*"/>
+                <exclude name="${dir.build.dist}/**/*"/>
+                <exclude name="${dir.build.dist}"/>
+                <exclude name="${dir.build}/**/*"/>
+                <exclude name="${dir.build}"/>
+                <exclude name="${dir.release}/**/*"/>
+                <exclude name="${dir.release}"/>
+                <exclude name="${dir.modules}/*/${dir.build}/**/*"/>
+                <exclude name="${dir.modules}/*/${dir.build}"/>
+            </fileset>
+        </zip>
+    </target>
+
+    <target name="_copy_deploy_files">
+        <copy failonerror="true" todir="${dir.build.deploy}">
+            <fileset dir="." includes="${dir.release}/**/*"/>
+            <fileset dir="${dir.build.runme}" includes="**/*"/>
+            <fileset dir="${dir.mod.server}/src" includes="**/*"/>
+        </copy>
+    </target>
+
+
+    <target name="clean" description="Cleans all generated files.">
+        <delete dir="${dir.build}" failonerror="false"/>
+    </target>
+
+    <target name="build" depends="_init,_package_midlet" description="Continous build (without clean)."/>
+
+    <target name="test" depends="_run_tests" description="Run all tests."/>
+
+    <target name="rebuild" depends="clean,build" description="Rebuild the system in development mode."/>
+
+    <target name="release" depends="rebuild" description="Build the system in release mode.">
+        <copy todir="${dir.release}" verbose="false">
+            <fileset dir="${dir.build.dist}"/>
+        </copy>
+        <increment_version part="build"/>
+    </target>
+
+    <target name="dist" description="Rebuild the system in distribution mode.">
+        <antcall target="rebuild"/>
+        <antcall target="_package_distribution"/>
+    </target>
+
+    <target name="run" depends="clean,build" description="Build application and run result in the WTK emulator.">
+        <antcall target="run_only"/>
+    </target>
+
+    <target name="run_only" description="Run application in the WTK emulator.">
+        <wtkrun heapsize="32M" jadfile="${jad.file}" classpath="${jar.file}"/>
+    </target>
+
+    <target name="runme" depends="_build_runme,runme_only" description="Build and start RunME Chooser in release folder."/>
+
+    <target name="runme_only" description="Start RunME Chooser in release folder.">
+        <java classname="net.intensicode.runme.MIDletChooser" fork="true" failonerror="true">
+            <classpath refid="classpath.build"/>
+            <classpath>
+                <pathelement path="${dir.release}/RunME.jar"/>
+            </classpath>
+        </java>
+    </target>
+
+    <target name="package" depends="clean" description="Build full distribution after clean rebuild.">
+        <delete failonerror="false" verbose="false" quiet="true">
+            <fileset dir="${dir.release}" includes="**/*"/>
+        </delete>
+
+        <antcall target="test"/>
+        <antcall target="_build_release"/>
+
+        <!-- This has to be the last step. Because the previous step deletes the release folder! -->
+        <antcall target="_package_runme"/>
+
+        <delete failonerror="false">
+            <fileset dir="${dir.build.deploy}" includes="**/*"/>
+        </delete>
+
+        <antcall target="_copy_deploy_files"/>
+
+        <increment_version part="version"/>
+    </target>
+
+    <target name="mrproper" description="Cleans all generated files and the release folder.">
+        <antcall target="clean"/>
+        <delete dir="${dir.release}" failonerror="false"/>
+    </target>
+
+    <target name="update_certificate" description="Generates a new certifacte for the WebStart signing.">
+        <property file="${dir.intensibuild}/signing_defaults.properties"/>
+
+        <exec executable="keytool" failonerror="false" failifexecutionfails="true">
+            <arg line="-delete -alias ${signing.alias} -keystore ${signing.keystore} -storepass ${signing.storepass}"/>
+        </exec>
+
+        <genkey alias="${signing.alias}" storepass="${signing.storepass}" keystore="${signing.keystore}"
+                dname="CN=The.Berlin.Factor, OU=Intensicode, O=Psychocell, C=DE" validity="360">
+        </genkey>
+    </target>
+
+</project>

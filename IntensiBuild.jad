@@ -1,0 +1,6 @@
+MIDlet-Vendor: ${vendor.name}
+MIDlet-Jar-URL: ${project.name}.jar
+MIDlet-Version: ${version}
+MIDlet-Name: ${project.name}
+MIDlet-Icon: /icon.png
+MIDlet-1: ${project.name}, /icon.png, ${midlet.class}
