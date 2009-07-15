@@ -5,90 +5,114 @@ h1. Description
 IntensiBuild is a light weight build system for creating J2ME applications. It uses a small set of Ruby scripts with a generic Ant build file to create device-specific builds.
 
 It is usually enough to have the IntensiBuild snapshot in your project under the relative path <code>modules/IntensiBuild</code> and create a small build.xml in you project root that imports the main build.xml from the IntensiBuild snapshot:
+
+<pre>
 <code>
-<project name="Example" default="build">
-    <import file="modules/IntensiBuild/build.xml"/>
-</project>
+        <project name="Example" default="build">
+            <import file="modules/IntensiBuild/build.xml"/>
+        </project>
 </code>
+</pre>
 
 For creating IntensiBuild releases of your application, you have to create configuration files. At least one file should be present under for example <code>config/Example.rb</code>:
+
+<pre>
 <code>
-# Name of the resulting jar/jad bundle (no special chars).
-@name = "Example"
+        # Name of the resulting jar/jad bundle (no special chars).
+        @name = "Example"
 
-# Possible targets are defined in file _targets.rb.
-@targets = [ Generic_MIDP2, Nokia_MIDP2 ]
+        # Possible targets are defined in file _targets.rb.
+        @targets = [ Generic_MIDP2, Nokia_MIDP2 ]
 
-# Possible sizes correspond to the image folders in the res directory.
-# You may use arbitrary folder names (no spaces or special chars) here -
-# as long as they exist.
-@sizes = [ "Default" ]
+        # Possible sizes correspond to the image folders in the res directory.
+        # You may use arbitrary folder names (no spaces or special chars) here -
+        # as long as they exist.
+        @sizes = [ "Default" ]
 
-# Use this to activate global - not target-specific - settings. Used
-# primarly for debug output and effects.
-@symbols = []
+        # Use this to activate global - not target-specific - settings. Used
+        # primarly for debug output and effects.
+        @symbols = []
 </code>
+</pre>
 
 The build system assumes there is a resource folder available with a structure matching the values given in the configuration file. If you name your project "Example" and build for a screen size "Default", the resource folder would need to look like:
+
+<pre>
 <code>
-res/Example/Default/
+        res/Example/Default/
 </code>
+</pre>
 
 Finally you need to define some default build.properties:
+
+<pre>
 <code>
-# Project name for when building a default release.
-project.name = Example
+        # Project name for when building a default release.
+        project.name = Example
 
-# Base name for the resulting .jar file.
-output.name = Example
+        # Base name for the resulting .jar file.
+        output.name = Example
 
-vendor.name = The.Berlin.Factor
+        vendor.name = The.Berlin.Factor
 
-screen.size = Default
+        screen.size = Default
 
-# Symbols for the primary configuration.
-defined_symbols = MIDP2,CLDC11,RUNME
+        # Symbols for the primary configuration.
+        defined_symbols = MIDP2,CLDC11,RUNME
 
-# Main class - stays the same for all configurations.
-midlet.class = net.intensicode.Main
+        # Main class - stays the same for all configurations.
+        midlet.class = net.intensicode.Main
 
-# Primary configuration for normal Ant build.
-release.configurations = Example
+        # Primary configuration for normal Ant build.
+        release.configurations = Example
 
-# Use this JAD file with - for example - a list of special MIDlet permissions.
-jad.template = Example.jad
+        # Use this JAD file with - for example - a list of special MIDlet permissions.
+        jad.template = Example.jad
 </code>
+</pre>
 
 Override the WTK location in env.properties if necessary:
+
+<pre>
 <code>
-wtk.home = /usr/local/wtk
+        wtk.home = /usr/local/wtk
 </code>
+</pre>
 
 Create a release.sh script for convenience:
+
+<pre>
 <code>
-ruby -Imodules/IntensiBuild/scripts modules/IntensiBuild/scripts/release.rb $*
+        ruby -Imodules/IntensiBuild/scripts modules/IntensiBuild/scripts/release.rb $*
 </code>
+</pre>
 
 Create the JAD template:
+
+<pre>
 <code>
-MIDlet-Icon: /icon.png
-MIDlet-Version: ${version}
-MIDlet-Name: ${project.name}
-MIDlet-Vendor: ${vendor.name}
-MIDlet-Jar-URL: ${project.name}.jar
-MIDlet-1: ${project.name}, /icon.png, ${midlet.class}
-MIDlet-Permissions: javax.microedition.io.Connector.http,javax.microedition.io.Connector.https,javax.microedition.io.Connector.bluetooth.client,javax.microedition.io.Connector.comm,javax.microedition.io.Connector.socket,javax.microedition.io.Connector.datagram
+        MIDlet-Icon: /icon.png
+        MIDlet-Version: ${version}
+        MIDlet-Name: ${project.name}
+        MIDlet-Vendor: ${vendor.name}
+        MIDlet-Jar-URL: ${project.name}.jar
+        MIDlet-1: ${project.name}, /icon.png, ${midlet.class}
+        MIDlet-Permissions: javax.microedition.io.Connector.http,javax.microedition.io.Connector.https,javax.microedition.io.Connector.bluetooth.client,javax.microedition.io.Connector.comm,javax.microedition.io.Connector.socket,javax.microedition.io.Connector.datagram
 </code>
+</pre>
 
 If you want to create a signed WebStart version using RunMe, you need to create a proper signing.properties file:
+
+<pre>
 <code>
-signing.keytool = /usr/local/jdk/bin/keytool
-signing.alias = intensicode
-signing.keypass = password
-signing.storepass = password
-signing.keystore = ${dir.intensibuild}/keystore.bin
-signing.dname = CN=intensicode, OU=it, O=intensicode, C=DE
+        signing.keytool = /usr/local/jdk/bin/keytool
+        signing.alias = intensicode
+        signing.keypass = password
+        signing.storepass = password
+        signing.keystore = ${dir.intensibuild}/keystore.bin
+        signing.dname = CN=intensicode, OU=it, O=intensicode, C=DE
 </code>
+</pre>
 
 Make sure you ran <code>ant update_certificate</code>.
 
