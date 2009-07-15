@@ -100,7 +100,7 @@ Creating a default configuration release build: <pre>ant release</pre>
 
 Creating a specific release: <pre>./release.sh config/Example.rb</pre>
 
-h2. License
+h1. License
 
 This is open source software. See the gpl.txt file for more infomation.
 
