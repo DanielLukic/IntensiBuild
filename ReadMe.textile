@@ -1,4 +1,4 @@
-Build system specialized for building IntensiGame-based applications.
+Build system specialized for building IntensiGame-based J2ME and J2SE applications.
 
 h1. Description
 
