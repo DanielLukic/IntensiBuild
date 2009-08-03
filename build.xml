@@ -152,9 +152,6 @@
             <keep name="*" extends="javax.microedition.midlet.MIDlet">
                 <method name="*"/>
             </keep>
-            <keep name="*" extends="net.intensicode.game.objects.Particle">
-                <method name="*"/>
-            </keep>
         </proguard>
     </target>
 
