@@ -15,7 +15,7 @@ end
 
 system( "ant mrproper >release.log" )
 
-ARGV.each { |filename|
+ARGV.each do |filename|
 
     config = nil
 
@@ -41,7 +41,7 @@ ARGV.each { |filename|
         system "cat release.log" if File.exist?('release.log')
         exit( 10 )
     end
-}
+end
 
 puts
 puts "Done. All configurations built."

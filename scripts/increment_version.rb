@@ -27,13 +27,13 @@ if part == 'release'
     release += 1
     version = 0
     build = 0
-end
-if part == 'version'
+elsif part == 'version'
     version += 1
     build = 0
-end
-if part == 'build'
+elsif part == 'build'
     build += 1
+else
+    show_only = true
 end
 
 if ( build > 99 )
@@ -54,6 +54,8 @@ if ( release > 99 )
 end
 
 output = "version=#{release}.#{version}.#{build}"
+exit 0 if File.exist?(output) and show_only
+
 File.open(target_file_name,'w') do |f|
     f.puts output
     f.puts "date=#{Time.now.strftime('%Y-%m-%d %H:%M:%S')}"

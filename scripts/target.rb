@@ -39,29 +39,33 @@ class TargetBase
     clean_up_symbols
   end
 
+  def platform
+    @platform.downcase
+  end
+
+  def platform=(value)
+    @platform = value.downcase
+  end
+
   def midp
     return '1.0' if symbols.index 'MIDP1'
     return '2.0' if symbols.index 'MIDP2'
-    return '2.0'
+    raise 'no MIDP version set'
   end
 
   def cldc
     return '1.0' if symbols.index 'CLDC10'
     return '1.1' if symbols.index 'CLDC11'
-    return '1.0'
+    raise 'no CLDC version set'
   end
 
   def libs
     my_symbols = symbols
 
-    midp_symbols = my_symbols.select { |s| /^MIDP/ =~ s }
-    my_symbols << 'MIDP2' if midp_symbols.empty?
-
-    cldc_symbols = my_symbols.select { |s| /^CLDC/ =~ s }
-    my_symbols << 'CLDC10' if cldc_symbols.empty?
-
     my_symbols.collect { |s| s + '.jar' }
   end
+
+  private
 
   def symbols_to_ary( symbols_list )
     symbols_list.split( /\s*,\s*/ )
@@ -92,12 +96,13 @@ class Target < TargetBase
   def initialize( group, symbols_list = '' )
     super( group, symbols_list )
     @name = group.name.dup
+    @platform = group.name.dup.downcase
     @symbols.each { |s| @name << '/' ; @name << s }
   end
 
   def to_s
     symbols_list = symbols.join ','
-    %{Target( '#{name}' '#{symbols_list}' 'CLDC#{cldc}' 'MIDP#{midp}' )}
+    %{Target( '#{name}' '#{symbols_list}' )}
   end
 
 end

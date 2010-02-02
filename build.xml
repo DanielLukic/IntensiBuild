@@ -16,10 +16,21 @@
     <!-- Load the build defaults. -->
     <property file="${dir.intensibuild}/build_defaults.properties"/>
 
-    <!-- Show some debugging output. -->
-    <echo message="WTK HOME: ${wtk.home}"/>
-    <echo message="PROJECT NAME: ${project.name}"/>
+    <condition property="android" value="true">
+        <equals arg1="${target.platform}" arg2="android"/>
+    </condition>
 
+    <condition property="j2me" value="true">
+        <equals arg1="${target.platform}" arg2="j2me"/>
+    </condition>
+
+    <condition property="java" value="true">
+        <equals arg1="${target.platform}" arg2="java"/>
+    </condition>
+
+    <!-- Show some debugging output. -->
+    <echo message="PROJECT NAME: ${project.name}"/>
+    <echo message="TARGET PLATFORM: ${target.platform}"/>
 
 
     <macrodef name="increment_version">
@@ -36,11 +47,19 @@
     </macrodef>
 
 
-    
-    <taskdef resource="antenna.properties" classpath="${dir.env.libraries}/antenna-bin-0.9.13-psychocell.jar"/>
-    <taskdef resource="proguard/ant/task.properties" classpath="${dir.env.libraries}/proguard-4.3.jar"/>
-    <taskdef resource="junit/task.properties"
-             classpath="${dir.env.libraries}/junit-3.8.1.jar;${dir.env.libraries}/ant-junit.jar"/>
+    <path id="android.antlibs">
+        <pathelement path="${android.home}/tools/lib/anttasks.jar" />
+        <pathelement path="${android.home}/tools/lib/sdklib.jar" />
+        <pathelement path="${android.home}/tools/lib/androidprefs.jar" />
+        <pathelement path="${android.home}/tools/lib/apkbuilder.jar" />
+        <pathelement path="${android.home}/tools/lib/jarutils.jar" />
+    </path>
+
+    <taskdef resource="net/sf/antcontrib/antcontrib.properties" classpath="${dir.env.libraries}/ant-contrib-1.0b2.jar"/>
+
+    <taskdef resource="antenna.properties" classpath="${dir.env.libraries}/antenna-bin-0.9.13-psychocell.jar;"/>
+    <taskdef resource="proguard/ant/task.properties" classpath="${dir.env.libraries}/proguard-4.3.jar;"/>
+    <taskdef resource="junit/task.properties" classpath="${file.junit.jar};${file.ant-junit.jar}"/>
 
     <taskdef name="junit" classname="org.apache.tools.ant.taskdefs.optional.junit.JUnitTask">
         <classpath>
@@ -49,28 +68,58 @@
         </classpath>
     </taskdef>
 
-    
+    <taskdef name="aaptexec" classname="com.android.ant.AaptExecLoopTask" classpathref="android.antlibs"/>
+    <taskdef name="apkbuilder" classname="com.android.ant.ApkBuilderTask" classpathref="android.antlibs"/>
 
-    <path id="classpath.libraries">
-        <fileset id="libraries" dir="${dir.libraries}" includes="*.jar"/>
+
+    <path id="classpath.libraries.android">
+        <fileset id="libraries.android" dir="${dir.libraries}/android" includes="*.jar"/>
     </path>
 
-    <path id="classpath.build">
-        <path refid="classpath.libraries"/>
+    <path id="classpath.libraries.j2me">
+        <fileset id="libraries.j2me" dir="${dir.libraries}/j2me" includes="*.jar"/>
+    </path>
+
+    <path id="classpath.libraries.java">
+        <fileset id="libraries.java" dir="${dir.libraries}/java" includes="*.jar"/>
+    </path>
+
+    <path id="classpath.build.android">
+        <path refid="classpath.libraries.android"/>
         <pathelement location="${dir.build.classes}"/>
+        <pathelement path="${build_libs}"/>
+    </path>
+
+    <path id="classpath.build.j2me">
+        <path refid="classpath.libraries.j2me"/>
+        <pathelement location="${dir.build.classes}"/>
+        <!--<pathelement path="${build_libs}"/> is set by the wtkbuild task through wtk.midpapi -->
+    </path>
+
+    <path id="classpath.build.java">
+        <path refid="classpath.libraries.java"/>
+        <pathelement location="${dir.build.classes}"/>
+        <pathelement path="${build_libs}"/>
+    </path>
+
+    <path id="classpath.build.runme">
+        <!--<pathelement location="${dir.build.classes}"/>-->
+        <!--<pathelement path="${build_libs}"/>-->
     </path>
 
     <path id="classpath.test">
-        <pathelement location="${dir.env.junit}/junit-3.8.1.jar"/>
+        <pathelement location="${file.junit.jar}"/>
         <pathelement location="${dir.build.tests}"/>
         <pathelement location="${dir.tests}"/>
-        <path refid="classpath.build"/>
+        <path refid="classpath.build.android"/>
+        <path refid="classpath.build.j2me"/>
+        <path refid="classpath.build.java"/>
     </path>
-
 
 
     <target name="_init">
         <mkdir dir="${dir.build}"/>
+        <mkdir dir="${dir.build.assets}"/>
         <mkdir dir="${dir.build.dist}"/>
         <mkdir dir="${dir.build.tests}"/>
         <mkdir dir="${dir.build.runme}"/>
@@ -80,7 +129,18 @@
         <mkdir dir="${dir.release}"/>
     </target>
 
-    <target name="_build_sources" depends="_init">
+    <target name="_make_build_properties">
+        <echoproperties destfile="${jad.properties}" failonerror="true"/>
+        <replaceregexp byline="true" file="${jad.properties}" match="(.*)=(.*)" replace="{\1}=\2"/>
+        <replaceregexp byline="true" file="${jad.properties}" match="(.*)=(.*)" replace="$\1=\2"/>
+    </target>
+
+    <target name="_update_android_manifest" depends="_make_build_properties" if="android">
+        <copy file="${android.manifest.template}" tofile="${android.manifest.file}" overwrite="true"/>
+        <replace replacefilterfile="${jad.properties}" file="${android.manifest.file}"/>
+    </target>
+
+    <target name="_build_android_sources" depends="_init,_update_android_manifest" if="android">
         <increment_version part="KEEP THE SAME"/>
 
         <property file="version.properties"/>
@@ -88,18 +148,66 @@
         <property name="date" value="UNKNOWN"/>
 
         <echo message="Defined symbols: ${defined_symbols}"/>
-        <wtkpreprocess srcdir="${dir.mod.core}/${dir.sources}" symbols="${defined_symbols}" destdir="${dir.build.sources}"/>
+        <wtkpreprocess srcdir="${dir.mod.intensigame}/${dir.sources}" symbols="${defined_symbols}"
+                       destdir="${dir.build.sources}"/>
+        <wtkpreprocess srcdir="${dir.mod.intensidroid}/${dir.sources}" symbols="${defined_symbols}"
+                       destdir="${dir.build.sources}"/>
+        <wtkpreprocess srcdir="${dir.sources}" symbols="${defined_symbols}" destdir="${dir.build.sources}"/>
+
+        <copy file="${android.manifest.file}" tofile="${dir.build}/AndroidManifest.xml"/>
+
+        <exec executable="${android.aapt}" failonerror="true">
+            <arg value="package"/>
+            <arg value="-v"/>
+            <arg value="-m"/>
+            <arg value="-J"/>
+            <arg path="${dir.build.sources}"/>
+            <arg value="-M"/>
+            <arg path="${dir.build}/AndroidManifest.xml"/>
+            <arg value="-S"/>
+            <arg path="${dir.resources.android}"/>
+            <arg value="-I"/>
+            <arg path="${android.jar}"/>
+        </exec>
+    </target>
+
+    <target name="_build_j2me_sources" depends="_init" if="j2me">
+        <increment_version part="KEEP THE SAME"/>
+
+        <property file="version.properties"/>
+        <property name="version" value="1.1.1"/>
+        <property name="date" value="UNKNOWN"/>
+
+        <echo message="Defined symbols: ${defined_symbols}"/>
+        <wtkpreprocess srcdir="${dir.mod.intensigame}/${dir.sources}" symbols="${defined_symbols}"
+                       destdir="${dir.build.sources}"/>
+        <wtkpreprocess srcdir="${dir.mod.intensime}/${dir.sources}" symbols="${defined_symbols}"
+                       destdir="${dir.build.sources}"/>
         <wtkpreprocess srcdir="${dir.sources}" symbols="${defined_symbols}" destdir="${dir.build.sources}"/>
     </target>
 
-    <target name="_build_classes" depends="_build_sources">
-        <wtkbuild source="1.3" target="1.3" srcdir="${dir.build.sources}"
-                  destdir="${dir.build.classes}" preverify="false"
-                  debug="false" cldc="${wtk.cldc.version}"
-                  classpathref="classpath.build"/>
+    <target name="_build_sources" depends="_build_android_sources,_build_j2me_sources"/>
+
+    <target name="_build_android_classes" depends="_build_sources" if="android">
+        <property name="debug" value="false"/>
+        <echo message="Debug? ${debug}"/>
+        <javac target="1.5" debug="${debug}" encoding="ascii"
+               srcdir="${dir.build.sources}" destdir="${dir.build.classes}"
+               classpathref="classpath.build.android"/>
     </target>
 
-    <target name="_build_release">
+    <target name="_build_j2me_classes" depends="_build_sources" if="j2me">
+        <property name="debug" value="false"/>
+        <wtkbuild source="1.3" target="1.3" srcdir="${dir.build.sources}"
+                  destdir="${dir.build.classes}" preverify="false"
+                  debug="${debug}" cldc="${wtk.cldc.version}"
+                  classpathref="classpath.build.j2me"/>
+    </target>
+
+    <target name="_build_classes" depends="_build_j2me_classes,_build_android_classes"/>
+
+    <target name="_build_release" depends="_init">
+        <echo message="Building releases: ${release.configurations}"/>
         <exec executable="ruby" failonerror="true" failifexecutionfails="true">
             <arg value="-I${dir.intensibuild}/scripts"/>
             <arg value="${dir.intensibuild}/scripts/release.rb"/>
@@ -107,14 +215,18 @@
         </exec>
     </target>
 
-    <target name="_build_tests" depends="_build_classes">
+    <target name="_enable_debug">
+        <property name="debug" value="true"/>
+    </target>
+
+    <target name="_build_tests" depends="_enable_debug,_build_classes">
         <javac srcdir="${dir.tests}" destdir="${dir.build.tests}" debug="true" classpathref="classpath.test"
-                target="1.5" source="1.5" />
+               target="1.5" source="1.5"/>
     </target>
 
     <target name="_build_runme" depends="_build_classes">
         <javac srcdir="${dir.runme.sources}" destdir="${dir.build.classes}" debug="true"
-               classpathref="classpath.build" target="1.5" source="1.5"/>
+               classpathref="classpath.build.runme" target="1.5" source="1.5"/>
         <jar file="${dir.release}/RunME.jar">
             <fileset dir="${dir.build.classes}" includes="**/*"/>
         </jar>
@@ -138,7 +250,7 @@
         </junit>
     </target>
 
-    <target name="_obfuscate">
+    <target name="_obfuscate_j2me" if="j2me">
         <proguard optimize="true" shrink="true" defaultpackage=""
                   printmapping="false" verbose="false"
                   usemixedcaseclassnames="false" obfuscate="${obfuscate}"
@@ -152,22 +264,55 @@
             <keep name="*" extends="javax.microedition.midlet.MIDlet">
                 <method name="*"/>
             </keep>
+            <keep name="*" extends="net.intensicode.blockshock.game.objects.Particle">
+                <method name="*"/>
+            </keep>
         </proguard>
     </target>
 
-    <target name="_preverify">
+    <target name="_obfuscate_android" if="android">
+        <copy todir="${dir.build.obfuscated}">
+            <fileset dir="${dir.build.classes}" includes="**/*"/>
+        </copy>
+        <!--<proguard optimize="true" shrink="true" defaultpackage=""-->
+                  <!--printmapping="false" verbose="false"-->
+                  <!--usemixedcaseclassnames="false" obfuscate="false"-->
+                  <!--overloadaggressively="true" printseeds="false"-->
+                  <!--allowaccessmodification="true" microedition="true">-->
+            <!--<injar dir="${dir.build.classes}"/>-->
+            <!--<outjar dir="${dir.build.obfuscated}"/>-->
+            <!--<libraryjar>-->
+                <!--<pathelement path="${wtk.midpapi}"/>-->
+            <!--</libraryjar>-->
+            <!--<keep name="*" extends="android.app.Activity">-->
+                <!--<method name="*"/>-->
+            <!--</keep>-->
+            <!--<keep name="*" extends="net.intensicode.blockshock.game.objects.Particle">-->
+                <!--<method name="*"/>-->
+            <!--</keep>-->
+        <!--</proguard>-->
+    </target>
+
+    <target name="_obfuscate" depends="_obfuscate_j2me,_obfuscate_android"/>
+
+    <target name="_preverify_android" if="android">
+        <condition property="dex_debug" value="--debug" else="">
+            <istrue value="${debug}"/>
+        </condition>
+        <exec executable="${android.dx}" failonerror="true">
+            <arg line="--dex ${dex_debug} --output=${dex_target} ${dir.build.obfuscated}"/>
+        </exec>
+    </target>
+
+    <target name="_preverify_j2me" if="j2me">
         <wtkpreverify cldc="${cldc_version}" srcdir="${dir.build.obfuscated}" destdir="${dir.build.preverified}"/>
     </target>
 
-    <target name="_make_jad_properties">
-        <echoproperties destfile="${jad.file}.properties" failonerror="true"/>
-        <replaceregexp byline="true" file="${jad.properties}" match="(.*)=(.*)" replace="{\1}=\2"/>
-        <replaceregexp byline="true" file="${jad.properties}" match="(.*)=(.*)" replace="$\1=\2"/>
-    </target>
+    <target name="_preverify" depends="_preverify_android,_preverify_j2me"/>
 
-    <target name="_update_jad">
+    <target name="_update_jad" if="j2me">
         <copy file="${jad.template}" tofile="${jad.file}" overwrite="true"/>
-        <antcall target="_make_jad_properties"/>
+        <antcall target="_make_build_properties"/>
         <replace replacefilterfile="${jad.properties}" file="${jad.file}"/>
         <delete file="${jad.properties}"/>
         <wtkjad jadfile="${jad.file}" name="${project.name}" vendor="${vendor.name}" autoversion="false" update="true">
@@ -183,9 +328,9 @@
         </exec>
     </target>
 
-    <target name="_update_jad_with_size">
+    <target name="_update_jad_with_size" if="j2me">
         <copy file="${jad.template}" tofile="${jad.file}" overwrite="true"/>
-        <antcall target="_make_jad_properties"/>
+        <antcall target="_make_build_properties"/>
         <replace replacefilterfile="${jad.properties}" file="${jad.file}"/>
         <delete file="${jad.properties}"/>
         <wtkjad jadfile="${jad.file}" jarfile="${jar.file}" name="${project.name}" vendor="${vendor.name}"
@@ -202,18 +347,31 @@
         </exec>
     </target>
 
-    <target name="_package_midlet" depends="_build_sources,_build_classes">
+    <target name="_merge_libs_android" depends="_init" if="android">
         <unjar dest="${dir.build.classes}">
-            <fileset refid="libraries"/>
+            <fileset refid="libraries.android"/>
         </unjar>
-        <antcall target="_obfuscate"/>
-        <antcall target="_preverify"/>
+    </target>
 
-        <antcall target="_update_jad"/>
+    <target name="_merge_libs_j2me" depends="_init" if="j2me">
+        <unjar dest="${dir.build.classes}">
+            <fileset refid="libraries.j2me"/>
+        </unjar>
+    </target>
 
-        <jar jarfile="${jar.file}" manifest="${jad.file}">
-            <fileset dir="${dir.build.preverified}"/>
-            <fileset dir="${dir.resources.root}">
+    <target name="_merge_libs_java" depends="_init" if="java">
+        <unjar dest="${dir.build.classes}">
+            <fileset refid="libraries.java"/>
+        </unjar>
+    </target>
+
+    <target name="_merge_libs" depends="_merge_libs_android,_merge_libs_j2me,_merge_libs_java"/>
+
+    <target name="_create_classes" depends="_build_sources,_build_classes,_merge_libs,_obfuscate,_preverify"/>
+
+    <target name="_collect_assets" depends="_init">
+        <copy todir="${dir.build.assets}" overwrite="false" verbose="true">
+            <fileset dir="${dir.resources.target}/${screen.size}">
                 <include name="*"/>
                 <include name="sound/*${target.sound_suffix}"/>
                 <include name="music/*${target.music_suffix}"/>
@@ -223,16 +381,79 @@
                 <include name="sound/*${target.sound_suffix}"/>
                 <include name="music/*${target.music_suffix}"/>
             </fileset>
+            <fileset dir="${dir.resources.platform}">
+                <include name="*"/>
+                <include name="sound/*${target.sound_suffix}"/>
+                <include name="music/*${target.music_suffix}"/>
+            </fileset>
+            <fileset dir="${dir.resources.root}">
+                <include name="*"/>
+                <include name="sound/*${target.sound_suffix}"/>
+                <include name="music/*${target.music_suffix}"/>
+            </fileset>
+        </copy>
+    </target>
+
+    <target name="_package_android" depends="_collect_assets" if="android">
+        <!-- This helped: http://asantoso.wordpress.com/2009/09/15/how-to-build-android-application-package-apk-from-the-command-line-using-the-sdk-tools-continuously-integrated-using-cruisecontrol/ -->
+        <copy file="${android.manifest.file}" tofile="${dir.build}/AndroidManifest.xml"/>
+        <exec executable="${android.aapt}">
+            <arg value="package"/>
+            <arg value="-v"/>
+            <arg value="-M"/>
+            <arg value="${dir.build}/AndroidManifest.xml"/>
+            <arg value="-F"/>
+            <arg value="${dir.build}/AndroidResources.apk"/>
+            <arg value="-I"/>
+            <arg value="${android.jar}"/>
+            <arg value="-S"/>
+            <arg value="${dir.resources.android}"/>
+            <arg value="-A"/>
+            <arg value="${dir.build.assets}"/>
+        </exec>
+        <exec executable="${android.apkbuilder}">
+            <arg value="${dir.build.dist}/${jar.basename}.apk"/>
+            <!--<arg value="-u"/>-->
+            <arg value="-z"/>
+            <arg value="${dir.build}/AndroidResources.apk"/>
+            <arg value="-f"/>
+            <arg value="${dex_target}"/>
+        </exec>
+        <!--<property file="${dir.intensibuild}/signing_defaults.properties"/>-->
+        <!--<signjar alias="${signing.alias}" storepass="${signing.storepass}"-->
+                 <!--keystore="${signing.keystore}" jar="${dir.build.dist}/${jar.basename}.apk" signedjar="${dir.build.dist}/${jar.basename}-signed.apk"/>-->
+    </target>
+
+    <target name="_package_j2me" if="j2me">
+        <antcall target="_update_jad"/>
+        <jar jarfile="${jar.file}" manifest="${jad.file}" duplicate="preserve">
+            <fileset dir="${dir.build.preverified}"/>
             <fileset dir="${dir.resources.target}/${screen.size}">
                 <include name="*"/>
                 <include name="sound/*${target.sound_suffix}"/>
                 <include name="music/*${target.music_suffix}"/>
             </fileset>
+            <fileset dir="${dir.resources.target}">
+                <include name="*"/>
+                <include name="sound/*${target.sound_suffix}"/>
+                <include name="music/*${target.music_suffix}"/>
+            </fileset>
+            <fileset dir="${dir.resources.platform}">
+                <include name="*"/>
+                <include name="sound/*${target.sound_suffix}"/>
+                <include name="music/*${target.music_suffix}"/>
+            </fileset>
+            <fileset dir="${dir.resources.root}">
+                <include name="*"/>
+                <include name="sound/*${target.sound_suffix}"/>
+                <include name="music/*${target.music_suffix}"/>
+            </fileset>
         </jar>
-
         <!-- Update again to set MIDlet-Jar-Size attribute. -->
         <antcall target="_update_jad_with_size"/>
     </target>
+
+    <target name="_package_application" depends="_create_classes,_package_android,_package_j2me"/>
 
     <target name="_sign_jar">
         <property file="${dir.intensibuild}/signing_defaults.properties"/>
@@ -240,16 +461,11 @@
                  keystore="${signing.keystore}" jar="${jar.runme}"/>
     </target>
 
-    <target name="_package_runme" depends="_build_runme">
-        <unjar dest="${dir.build.classes}">
-            <fileset refid="libraries"/>
-        </unjar>
-
+    <target name="_package_runme" depends="_build_runme,_merge_libs_j2me">
         <delete file="${jar.runme}" failonerror="false"/>
         <jar jarfile="${jar.runme}" duplicate="preserve">
-            <fileset dir="deploy" includes="runme.properties"/>
             <fileset dir="${dir.build.classes}"/>
-            <fileset dir="${dir.resources.root}">
+            <fileset dir="${dir.resources.target}/${screen.size}">
                 <include name="*"/>
                 <include name="sound/*${target.sound_suffix}"/>
                 <include name="music/*${target.music_suffix}"/>
@@ -259,7 +475,7 @@
                 <include name="sound/*${target.sound_suffix}"/>
                 <include name="music/*${target.music_suffix}"/>
             </fileset>
-            <fileset dir="${dir.resources.target}/${screen.size}">
+            <fileset dir="${dir.resources.root}">
                 <include name="*"/>
                 <include name="sound/*${target.sound_suffix}"/>
                 <include name="music/*${target.music_suffix}"/>
@@ -268,13 +484,7 @@
                 <attribute name="Main-Class" value="${main.class}"/>
             </manifest>
         </jar>
-
         <antcall target="_sign_jar"/>
-
-        <copy todir="${dir.build.runme}">
-            <fileset dir="deploy" includes="**/*"/>
-            <fileset dir="deploy" includes="**/.htaccess"/>
-        </copy>
     </target>
 
     <target name="_package_distribution">
@@ -294,20 +504,12 @@
         </zip>
     </target>
 
-    <target name="_copy_deploy_files">
-        <copy failonerror="true" todir="${dir.build.deploy}">
-            <fileset dir="." includes="${dir.release}/**/*"/>
-            <fileset dir="${dir.build.runme}" includes="**/*"/>
-            <fileset dir="${dir.mod.server}/src" includes="**/*"/>
-        </copy>
-    </target>
-
 
     <target name="clean" description="Cleans all generated files.">
         <delete dir="${dir.build}" failonerror="false"/>
     </target>
 
-    <target name="build" depends="_init,_package_midlet" description="Continous build (without clean)."/>
+    <target name="build" depends="_init,_package_application" description="Continous build (without clean)."/>
 
     <target name="test" depends="_run_tests" description="Run all tests."/>
 
@@ -317,7 +519,7 @@
         <copy todir="${dir.release}" verbose="false">
             <fileset dir="${dir.build.dist}"/>
         </copy>
-        <increment_version part="build"/>
+        <!--<increment_version part="build"/>-->
     </target>
 
     <target name="dist" description="Rebuild the system in distribution mode.">
@@ -333,11 +535,12 @@
         <wtkrun heapsize="32M" jadfile="${jad.file}" classpath="${jar.file}"/>
     </target>
 
-    <target name="runme" depends="_build_runme,runme_only" description="Build and start RunME Chooser in release folder."/>
+    <target name="runme" depends="_build_runme,runme_only"
+            description="Build and start RunME Chooser in release folder."/>
 
     <target name="runme_only" description="Start RunME Chooser in release folder.">
         <java classname="net.intensicode.runme.MIDletChooser" fork="true" failonerror="true">
-            <classpath refid="classpath.build"/>
+            <classpath refid="classpath.build.runme"/>
             <classpath>
                 <pathelement path="${dir.release}/RunME.jar"/>
             </classpath>
@@ -354,19 +557,12 @@
 
         <!-- This has to be the last step. Because the previous step deletes the release folder! -->
         <antcall target="_package_runme"/>
-
-        <delete failonerror="false">
-            <fileset dir="${dir.build.deploy}" includes="**/*"/>
-        </delete>
-
-        <antcall target="_copy_deploy_files"/>
-
-        <increment_version part="version"/>
     </target>
 
     <target name="mrproper" description="Cleans all generated files and the release folder.">
         <antcall target="clean"/>
         <delete dir="${dir.release}" failonerror="false"/>
+        <delete dir="${dir.submission}" failonerror="false"/>
     </target>
 
     <target name="update_certificate" description="Generates a new certifacte for the WebStart signing.">
@@ -379,6 +575,23 @@
         <genkey alias="${signing.alias}" storepass="${signing.storepass}" keystore="${signing.keystore}"
                 dname="CN=The.Berlin.Factor, OU=Intensicode, O=Psychocell, C=DE" validity="360">
         </genkey>
+    </target>
+
+    <target name="version" description="Show current version.">
+        <property file="version.properties"/>
+        <property name="version" value="UNKNOWN"/>
+        <property name="date" value="UNKNOWN"/>
+        <echo message="version: ${version}"/>
+        <echo message="date: ${date}"/>
+    </target>
+    <target name="version:bump:build" description="Increase version build number.">
+        <increment_version part="build"/>
+    </target>
+    <target name="version:bump:version" description="Increase version version number.">
+        <increment_version part="version"/>
+    </target>
+    <target name="version:bump:release" description="Increase version release number.">
+        <increment_version part="release"/>
     </target>
 
 </project>
