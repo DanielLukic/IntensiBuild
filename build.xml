@@ -561,6 +561,8 @@
 
     <target name="mrproper" description="Cleans all generated files and the release folder.">
         <antcall target="clean"/>
+        <delete dir="." includes="release.log" failonerror="false"/>
+        <delete dir="." includes="release.properties" failonerror="false"/>
         <delete dir="${dir.release}" failonerror="false"/>
         <delete dir="${dir.submission}" failonerror="false"/>
     </target>
