@@ -34,14 +34,14 @@ namespace :modules do
     end
   end
 
-  desc "Reset the GIT sub-modules by removing any local changes."
-  task :reset do
-    git_modules.each { |m| git.reset_module(m) }
-  end
+#  desc "Reset the GIT sub-modules by removing any local changes."
+#  task :reset do
+#    git_modules.each { |m| git.reset_module(m) }
+#  end
 
-  desc "Delete the GIT sub-modules by removing the folders."
-  task :delete do
-    git_modules.each { |m| git.delete_module(m) }
-  end
+#  desc "Delete the GIT sub-modules by removing the folders."
+#  task :delete do
+#    git_modules.each { |m| git.delete_module(m) }
+#  end
 
 end
