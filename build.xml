@@ -372,9 +372,7 @@
     <target name="_collect_assets" depends="_init">
         <copy todir="${dir.build.assets}" overwrite="false" verbose="true">
             <fileset dir="${dir.resources.target}/${screen.size}">
-                <include name="*"/>
-                <include name="sound/*${target.sound_suffix}"/>
-                <include name="music/*${target.music_suffix}"/>
+                <include name="**/*"/>
             </fileset>
             <fileset dir="${dir.resources.target}">
                 <include name="*"/>

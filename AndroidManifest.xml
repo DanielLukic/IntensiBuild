@@ -2,8 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="${midlet.package}" android:versionCode="1" android:versionName="1.0">
     <application android:icon="@drawable/icon" android:label="${project.name}">
-        <activity android:name="${midlet.classname}" android:label="${project.name}"
-                  android:screenOrientation="portrait">
+        <activity android:name="${midlet.classname}" android:label="${project.name}">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
