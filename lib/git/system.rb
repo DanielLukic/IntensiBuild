@@ -25,17 +25,11 @@ module Git
       end
     end
 
-#    def reset_module(git_module)
-#      with_fully_validated(git_module) do
-#        execute "cd #{git_module.path} ; git checkout . ; git clean -f"
-#      end
-#    end
-
-#    def delete_module(git_module)
-#      with_fully_validated(git_module) do
-#        execute "rm -rf #{git_module.path}"
-#      end
-#    end
+    def stash_module(git_module)
+      with_validated(git_module) do
+        execute "cd #{git_module.path} ; git stash"
+      end
+    end
 
     protected
 
