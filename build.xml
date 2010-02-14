@@ -71,6 +71,9 @@
     <taskdef name="aaptexec" classname="com.android.ant.AaptExecLoopTask" classpathref="android.antlibs"/>
     <taskdef name="apkbuilder" classname="com.android.ant.ApkBuilderTask" classpathref="android.antlibs"/>
 
+    <taskdef name="groovy" classname="org.codehaus.groovy.ant.Groovy"
+             classpath="${dir.env.groovy}/groovy-all-1.7.0.jar"/>
+
 
     <path id="classpath.libraries.android">
         <fileset id="libraries.android" dir="${dir.libraries}/android" includes="*.jar"/>
@@ -127,6 +130,12 @@
         <mkdir dir="${dir.build.obfuscated}"/>
         <mkdir dir="${dir.build.preverified}"/>
         <mkdir dir="${dir.release}"/>
+        <antcall target="_update_font_sizes"/>
+    </target>
+
+    <target name="_update_font_sizes">
+        <fileset id="res_font_images" dir="." includes="res/**/*font.png"/>
+        <groovy src="${dir.intensibuild}/groovy/AntFontSizer.groovy"/>
     </target>
 
     <target name="_make_build_properties">

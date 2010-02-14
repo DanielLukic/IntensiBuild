@@ -1,0 +1,114 @@
+package net.intensicode.tools
+
+import java.awt.image.BufferedImage
+import javax.imageio.ImageIO
+
+class FontSizer
+{
+  public static def DEFAULT_EXTENSION = ".dst"
+
+  public int cellsPerRow
+  public int cellsPerColumn
+  public int cellWidth
+  public int cellHeight
+
+  public static void process(aInputFile, aOutputFile)
+  {
+    def sizer = new FontSizer(16, 8)
+
+    sizer.prepare(aInputFile)
+    println "processing ${sizer.cellWidth}x${sizer.cellHeight} size cells"
+    println "processing ${sizer.cellsPerRow}x${sizer.cellsPerColumn} cells"
+
+    def sizes = sizer.determineSizes()
+
+    def output = new DataOutputStream(new FileOutputStream(aOutputFile))
+    output.write(sizes)
+    output.flush()
+    output.close()
+
+    println "wrote ${aOutputFile.size()} bytes"
+  }
+
+  public FontSizer(aCellsPerRow, aCellsPerColumn)
+  {
+    cellsPerRow = aCellsPerRow
+    cellsPerColumn = aCellsPerColumn
+  }
+
+  public void prepare(aInputFile)
+  {
+    myInputImage = ImageIO.read(aInputFile)
+
+    int imageWidth = myInputImage.width
+    int imageHeight = myInputImage.height
+
+    cellWidth = imageWidth / cellsPerRow;
+    if ( imageWidth != (cellsPerRow * cellWidth) )
+    {
+      fail("bad input image width ${imageWidth} for ${cellsPerRow} cells per row")
+    }
+
+    cellHeight = imageHeight / cellsPerColumn;
+    if ( imageHeight != (cellsPerColumn * cellHeight) )
+    {
+      fail("bad input image height ${imageHeight} for ${cellsPerColumn} cells per column")
+    }
+
+    myZeroSize = cellWidth * 2 / 3;
+    myCharOffset = Math.max(1, cellWidth / 8)
+
+    myPixelBuffer = new int[cellWidth * cellHeight]
+  }
+
+  public byte[] determineSizes()
+  {
+    def sizes = new byte[cellsPerRow * cellsPerColumn]
+
+    for ( int y = 0; y < cellsPerColumn; y++ )
+    {
+      for ( int x = 0; x < cellsPerRow; x++ )
+      {
+        def code = x + y * cellsPerRow;
+        def width = myZeroSize
+        if ( code != 0 )
+        {
+          int inputX = x * cellWidth;
+          int inputY = y * cellHeight;
+          myInputImage.getRGB(inputX, inputY, cellWidth, cellHeight, myPixelBuffer, 0, cellWidth)
+          width = findWidth(myPixelBuffer, cellWidth, cellHeight) + myCharOffset;
+        }
+        sizes[ code ] = Math.min(cellWidth, width)
+      }
+    }
+    return sizes
+  }
+
+  // Implementation
+
+  private void fail(aMessage)
+  {
+    throw new RuntimeException(aMessage)
+  }
+
+  private int findWidth(aBuffer, aWidth, aHeight)
+  {
+    for ( int x = aWidth - 1; x >= 0; x-- )
+    {
+      def columnInUse = false;
+      for ( int y = aHeight - 1; y >= 0; y-- )
+      {
+        def dataPos = x + y * aWidth;
+        def alphaValue = aBuffer[ dataPos ] & 0xFF000000;
+        if ( alphaValue != 0 ) columnInUse = true;
+      }
+      if ( columnInUse ) return Math.min(x + 1, aWidth)
+    }
+    return 0;
+  }
+
+  private BufferedImage myInputImage
+  private int myZeroSize
+  private int myCharOffset
+  private int[] myPixelBuffer
+}
