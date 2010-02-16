@@ -135,7 +135,7 @@
 
     <target name="_update_font_sizes">
         <fileset id="res_font_images" dir="." includes="res/**/*font.png"/>
-        <groovy src="${dir.intensibuild}/groovy/AntFontSizer.groovy"/>
+        <groovy src="${dir.intensibuild}/src/groovy/AntFontSizer.groovy"/>
     </target>
 
     <target name="_make_build_properties">
