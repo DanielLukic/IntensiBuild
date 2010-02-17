@@ -9,7 +9,7 @@ module Git
     def init_module(git_module)
       return unless git_module.is_init_required?
       remove_module(git_module) if git_module.folder_exists?
-      url = determine_repository_url git_module.repository
+      url = determine_url_for git_module
       execute "git clone #{url} #{git_module.path}"
     end
 
