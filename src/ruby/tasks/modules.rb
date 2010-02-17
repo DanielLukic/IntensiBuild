@@ -1,7 +1,8 @@
 namespace :modules do
 
   def git_modules
-    git_config.modules
+    return git_config.modules if git_config.has_modules?
+    raise "no git modules defined - is #{Git::Configuration::GITMODULES_PATH} missing?"
   end
 
   def git_config
