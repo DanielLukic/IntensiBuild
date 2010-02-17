@@ -2,10 +2,10 @@
 # ABSTRACT TARGET GROUPS - CANNOT BE USED AS TARGET
 
 ANDROID = TargetGroup.new       "ANDROID"
-ANDROID.sound_suffix            = '.mp3'
-ANDROID.sound_type              = 'audio/mp3'
-ANDROID.music_suffix            = '.mp3'
-ANDROID.music_type              = 'audio/mp3'
+ANDROID.sound_suffix            = '.ogg'
+ANDROID.sound_type              = 'audio/ogg'
+ANDROID.music_suffix            = '.ogg'
+ANDROID.music_type              = 'audio/ogg'
 
 JAVA = TargetGroup.new          "JAVA"
 JAVA.sound_suffix               = '.mp3'
