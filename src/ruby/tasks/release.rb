@@ -11,7 +11,7 @@ namespace :release do
   end
 
   def release(configurations)
-    scripts_folder = "modules/IntensiBuild/src/ruby"
+    scripts_folder = "#{INTENSIBUILD_FOLDER}/src/ruby"
     release_command = "ruby -I#{scripts_folder} #{scripts_folder}/release.rb"
     release_command_line = "#{release_command} #{configurations.join(' ')}"
     puts release_command_line
