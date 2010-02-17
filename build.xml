@@ -603,4 +603,6 @@
         <increment_version part="release"/>
     </target>
 
+    <import file="build_android_utils.xml"/>
+
 </project>
