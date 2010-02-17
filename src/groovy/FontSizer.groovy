@@ -1,5 +1,3 @@
-package net.intensicode.tools
-
 import java.awt.image.BufferedImage
 import javax.imageio.ImageIO
 
@@ -12,13 +10,25 @@ class FontSizer
   public int cellWidth
   public int cellHeight
 
+  public static void main(String[] aArguments)
+  {
+    new File('res').eachFileRecurse {
+      def fontFileName = it.path
+      if ( fontFileName.endsWith('font.png') )
+      {
+        def dstFileName = fontFileName.replaceAll('.png', '.dst')
+        def dst = new File(dstFileName)
+        if ( it.lastModified() > dst.lastModified() ) process(it, dst)
+      }
+    }
+  }
+
   public static void process(aInputFile, aOutputFile)
   {
     def sizer = new FontSizer(16, 8)
 
     sizer.prepare(aInputFile)
-    println "processing ${sizer.cellWidth}x${sizer.cellHeight} size cells"
-    println "processing ${sizer.cellsPerRow}x${sizer.cellsPerColumn} cells"
+    println "processing ${aInputFile} into ${aOutputFile}"
 
     def sizes = sizer.determineSizes()
 

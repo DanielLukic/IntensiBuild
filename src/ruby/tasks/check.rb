@@ -1,6 +1,6 @@
 namespace :check do
 
-  COMMANDS=%w(git jruby)
+  COMMANDS=%w(git groovy jruby)
 
   def check(command)
     success = system "which >/dev/null #{command}"

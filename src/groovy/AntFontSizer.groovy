@@ -1,5 +1,3 @@
-import net.intensicode.tools.FontSizer
-
 SUFFIX_PATTERN = /\.[a-zA-Z0-9]+$/
 
 project.references.res_font_images.each
