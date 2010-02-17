@@ -1,7 +1,9 @@
 namespace :release do
 
   def all_configurations
-    Dir.glob('config/*.config').sort
+    config_files = Dir.glob('config/*.config')
+    ruby_files = Dir.glob('config/*.rb').select {|f| not f =~ /^_[0-9]+x[0-9]\.rb$/ }
+    (config_files + ruby_files).sort
   end
 
   def default_configuration
@@ -9,9 +11,11 @@ namespace :release do
   end
 
   def release(configurations)
-    scripts_folder = "modules/IntensiBuild/scripts"
+    scripts_folder = "modules/IntensiBuild/src/ruby"
     release_command = "ruby -I#{scripts_folder} #{scripts_folder}/release.rb"
-    run "#{release_command} #{configurations.join(' ')}"
+    release_command_line = "#{release_command} #{configurations.join(' ')}"
+    puts release_command_line
+    run release_command_line
   end
 
   desc "Build all releases matching config/*.config."

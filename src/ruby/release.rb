@@ -5,8 +5,8 @@ require File.join( File.dirname( $0 ), 'target.rb' )
 
 
 
-load File.join( File.dirname( $0 ), '..', 'config', '_groups.rb' )
-load File.join( File.dirname( $0 ), '..', 'config', '_targets.rb' )
+load File.join( File.dirname( $0 ), '..', '..', 'config', '_groups.rb' )
+load File.join( File.dirname( $0 ), '..', '..','config', '_targets.rb' )
 
 if ARGV.size == 0
     puts "Usage: #{$0} [config_name|config_file]+"

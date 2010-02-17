@@ -39,7 +39,7 @@
         <sequential>
             <exec executable="ruby" failonerror="true" failifexecutionfails="true">
                 <arg value="-I${dir.intensibuild}/scripts"/>
-                <arg value="${dir.intensibuild}/scripts/increment_version.rb"/>
+                <arg value="${dir.scripts}/increment_version.rb"/>
                 <arg value="@{file}"/>
                 <arg value="@{part}"/>
             </exec>
@@ -219,7 +219,7 @@
         <echo message="Building releases: ${release.configurations}"/>
         <exec executable="ruby" failonerror="true" failifexecutionfails="true">
             <arg value="-I${dir.intensibuild}/scripts"/>
-            <arg value="${dir.intensibuild}/scripts/release.rb"/>
+            <arg value="${dir.scripts}/release.rb"/>
             <arg line="${release.configurations}"/>
         </exec>
     </target>
@@ -331,7 +331,7 @@
         </wtkjad>
         <exec executable="ruby" failonerror="true" failifexecutionfails="true">
             <arg value="-I${dir.intensibuild}/scripts"/>
-            <arg value="${dir.intensibuild}/scripts/merge_manifest.rb"/>
+            <arg value="${dir.scripts}/merge_manifest.rb"/>
             <arg value="${jad.file}"/>
             <arg value="${manifest_additions}"/>
         </exec>
@@ -350,7 +350,7 @@
         </wtkjad>
         <exec executable="ruby" failonerror="true" failifexecutionfails="true">
             <arg value="-I${dir.intensibuild}/scripts"/>
-            <arg value="${dir.intensibuild}/scripts/merge_manifest.rb"/>
+            <arg value="${dir.scripts}/merge_manifest.rb"/>
             <arg value="${jad.file}"/>
             <arg value="${manifest_additions}"/>
         </exec>
