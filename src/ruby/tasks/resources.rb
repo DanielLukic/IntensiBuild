@@ -5,7 +5,7 @@ namespace :resources do
   end
 
   def font_sizer(image_file)
-    run "#{INTENSIBUILD_FOLDER}/src/jruby/font_sizer.rb #{image_file}"
+    run "jruby #{INTENSIBUILD_FOLDER}/src/jruby/font_sizer.rb #{image_file}"
   end
 
   desc "Create the font-size data files for all font images."
