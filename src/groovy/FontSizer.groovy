@@ -20,6 +20,14 @@ class FontSizer
         def dst = new File(dstFileName)
         if ( it.lastModified() > dst.lastModified() ) process(it, dst)
       }
+      if ( fontFileName.endsWith('.bfm') )
+      {
+        def dstFileName = fontFileName.replaceAll('.bfm', '.dst')
+        fontFileName = fontFileName.replaceAll('.bfm', '.png')
+        def png = new File(fontFileName)
+        def dst = new File(dstFileName)
+        if ( png.lastModified() > dst.lastModified() ) process(png, dst)
+      }
     }
   }
 
