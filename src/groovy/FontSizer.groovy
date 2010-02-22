@@ -4,6 +4,7 @@ import javax.imageio.ImageIO
 class FontSizer
 {
   public static def DEFAULT_EXTENSION = ".dst"
+  public static int DEFAULT_ALPHA_THRESHOLD = 128
 
   public int cellsPerRow
   public int cellsPerColumn
@@ -52,6 +53,7 @@ class FontSizer
   {
     cellsPerRow = aCellsPerRow
     cellsPerColumn = aCellsPerColumn
+    myAlphaThreshold = DEFAULT_ALPHA_THRESHOLD
   }
 
   public void prepare(aInputFile)
@@ -61,7 +63,7 @@ class FontSizer
     int imageWidth = myInputImage.width
     int imageHeight = myInputImage.height
 
-    cellWidth = imageWidth / cellsPerRow;
+    cellWidth = imageWidth / cellsPerRow
     if ( imageWidth != (cellsPerRow * cellWidth) )
     {
       fail("bad input image width ${imageWidth} for ${cellsPerRow} cells per row")
@@ -73,7 +75,7 @@ class FontSizer
       fail("bad input image height ${imageHeight} for ${cellsPerColumn} cells per column")
     }
 
-    myZeroSize = cellWidth * 2 / 3;
+    myZeroSize = cellWidth * 2 / 3
     myCharOffset = Math.max(1, cellWidth / 8)
 
     myPixelBuffer = new int[cellWidth * cellHeight]
@@ -91,10 +93,10 @@ class FontSizer
         def width = myZeroSize
         if ( code != 0 )
         {
-          int inputX = x * cellWidth;
-          int inputY = y * cellHeight;
+          int inputX = x * cellWidth
+          int inputY = y * cellHeight
           myInputImage.getRGB(inputX, inputY, cellWidth, cellHeight, myPixelBuffer, 0, cellWidth)
-          width = findWidth(myPixelBuffer, cellWidth, cellHeight) + myCharOffset;
+          width = findWidth(myPixelBuffer, cellWidth, cellHeight) + myCharOffset
         }
         sizes[ code ] = Math.min(cellWidth, width)
       }
@@ -113,20 +115,21 @@ class FontSizer
   {
     for ( int x = aWidth - 1; x >= 0; x-- )
     {
-      def columnInUse = false;
+      def columnInUse = false
       for ( int y = aHeight - 1; y >= 0; y-- )
       {
-        def dataPos = x + y * aWidth;
-        def alphaValue = aBuffer[ dataPos ] & 0xFF000000;
-        if ( alphaValue != 0 ) columnInUse = true;
+        def dataPos = x + y * aWidth
+        def alphaValue = ( ( aBuffer[ dataPos ] & 0xFF000000 ) >> 24 ) & 0xFF
+        if ( alphaValue > myAlphaThreshold ) columnInUse = true
       }
       if ( columnInUse ) return Math.min(x + 1, aWidth)
     }
-    return 0;
+    return 0
   }
 
   private BufferedImage myInputImage
   private int myZeroSize
   private int myCharOffset
+  private int myAlphaThreshold
   private int[] myPixelBuffer
 }
