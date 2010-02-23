@@ -5,6 +5,7 @@ class Configuration
     attr_accessor :sizes
     attr_accessor :symbols
     attr_accessor :manifest
+    attr_accessor :properties
 
     def initialize( filename = nil )
         @config_dir = File.dirname filename
@@ -14,6 +15,7 @@ class Configuration
         @sizes = [ "240x320" ]
         @symbols = ''
         @manifest = {}
+        @properties = {}
 
         parse filename if filename
 

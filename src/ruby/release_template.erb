@@ -34,3 +34,7 @@ midp_version = <%= target.midp %>
 target.leftsoft = <%= target.keycodes.leftsoft %>
 target.rightsoft = <%= target.keycodes.rightsoft %>
 <% end %>
+
+<% config.properties.each do |key,value| %>
+<%= key %> = <%= value %>
+<% end %>
