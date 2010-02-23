@@ -63,12 +63,14 @@ def write_release_properties( config, target, screen_size )
     symbols = config_symbols + target.symbols
     defined_symbols = list_to_string( symbols, '', ',' )
     jar_suffix = target.name.gsub( /[^\w]/, '_' )
+    jar_suffix = jar_suffix.split('_').uniq.join('_')
 
     attributes = config.manifest
     attributes.merge! target.manifest
     manifest_additions = hash_to_string( config.manifest, '=>', ' || ' )
 
-    build_libs = list_to_string( target.libs, '${dir.intensibuild}/lib/devices/', ';' )
+    available_libs = target.libs.select {|lib| File.exist?(File.join("modules/IntensiBuild/lib/devices", lib))}
+    build_libs = list_to_string( available_libs, '${dir.intensibuild}/lib/devices/', ';' )
 
     name = config.name
     output_name = name.gsub( / /, '_' )
