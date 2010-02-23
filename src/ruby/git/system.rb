@@ -39,7 +39,7 @@ module Git
 
     def with_validated(git_module, options = {}, &block)
       if git_module.is_init_required?(options)
-        git_module.show_module_problems(options)
+        puts "init required for #{git_module}"
       else
         block.call
       end
