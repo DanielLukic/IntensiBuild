@@ -216,6 +216,7 @@
     <target name="_build_classes" depends="_build_j2me_classes,_build_android_classes"/>
 
     <target name="_build_release" depends="_init">
+        <increment_version part="build"/>
         <echo message="Building releases: ${release.configurations}"/>
         <exec executable="ruby" failonerror="true" failifexecutionfails="true">
             <arg value="-I${dir.intensibuild}/scripts"/>
@@ -526,7 +527,6 @@
         <copy todir="${dir.release}" verbose="false">
             <fileset dir="${dir.build.dist}"/>
         </copy>
-        <!--<increment_version part="build"/>-->
     </target>
 
     <target name="dist" description="Rebuild the system in distribution mode.">
