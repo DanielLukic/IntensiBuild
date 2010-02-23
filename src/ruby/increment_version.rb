@@ -54,7 +54,7 @@ if ( release > 99 )
 end
 
 output = "version=#{release}.#{version}.#{build}"
-exit 0 if File.exist?(output) and show_only
+exit 0 if File.exist?(target_file_name) and show_only
 
 File.open(target_file_name,'w') do |f|
     f.puts output
