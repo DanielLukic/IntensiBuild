@@ -41,7 +41,7 @@
                 <arg value="-I${dir.intensibuild}/scripts"/>
                 <arg value="${dir.scripts}/increment_version.rb"/>
                 <arg value="@{file}"/>
-                <arg value="@{part}"/>
+                <arg line="@{part}"/>
             </exec>
         </sequential>
     </macrodef>
@@ -216,7 +216,6 @@
     <target name="_build_classes" depends="_build_j2me_classes,_build_android_classes"/>
 
     <target name="_build_release" depends="_init">
-        <increment_version part="build"/>
         <echo message="Building releases: ${release.configurations}"/>
         <exec executable="ruby" failonerror="true" failifexecutionfails="true">
             <arg value="-I${dir.intensibuild}/scripts"/>
@@ -524,6 +523,8 @@
     <target name="rebuild" depends="clean,build" description="Rebuild the system in development mode."/>
 
     <target name="release" depends="rebuild" description="Build the system in release mode.">
+        <increment_version part="build date"/>
+
         <copy todir="${dir.release}" verbose="false">
             <fileset dir="${dir.build.dist}"/>
         </copy>
@@ -555,6 +556,8 @@
     </target>
 
     <target name="package" depends="clean" description="Build full distribution after clean rebuild.">
+        <increment_version part="build date"/>
+
         <delete failonerror="false" verbose="false" quiet="true">
             <fileset dir="${dir.release}" includes="**/*"/>
         </delete>
@@ -589,18 +592,26 @@
     <target name="version" description="Show current version.">
         <property file="version.properties"/>
         <property name="version" value="UNKNOWN"/>
+        <property name="build" value="UNKNOWN"/>
         <property name="date" value="UNKNOWN"/>
         <echo message="version: ${version}"/>
+        <echo message="build: ${build}"/>
         <echo message="date: ${date}"/>
+    </target>
+    <target name="version:bump:date" description="Update version date.">
+        <increment_version part="date"/>
     </target>
     <target name="version:bump:build" description="Increase version build number.">
         <increment_version part="build"/>
     </target>
+    <target name="version:bump:minor" description="Increase version minor number.">
+        <increment_version part="minor"/>
+    </target>
+    <target name="version:bump:major" description="Increase version major number.">
+        <increment_version part="major"/>
+    </target>
     <target name="version:bump:version" description="Increase version version number.">
         <increment_version part="version"/>
-    </target>
-    <target name="version:bump:release" description="Increase version release number.">
-        <increment_version part="release"/>
     </target>
 
     <import file="build_android_utils.xml"/>
