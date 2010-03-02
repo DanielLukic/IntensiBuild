@@ -58,7 +58,7 @@
     <taskdef resource="net/sf/antcontrib/antcontrib.properties" classpath="${dir.env.libraries}/ant-contrib-1.0b2.jar"/>
 
     <taskdef resource="antenna.properties" classpath="${dir.env.libraries}/antenna-bin-0.9.13-psychocell.jar;"/>
-    <taskdef resource="proguard/ant/task.properties" classpath="${dir.env.libraries}/proguard-4.3.jar;"/>
+    <taskdef resource="proguard/ant/task.properties" classpath="${dir.env.libraries}/proguard-4.5.jar;"/>
     <taskdef resource="junit/task.properties" classpath="${file.junit.jar};${file.ant-junit.jar}"/>
 
     <taskdef name="junit" classname="org.apache.tools.ant.taskdefs.optional.junit.JUnitTask">
@@ -280,26 +280,22 @@
     </target>
 
     <target name="_obfuscate_android" if="android">
-        <copy todir="${dir.build.obfuscated}">
-            <fileset dir="${dir.build.classes}" includes="**/*"/>
-        </copy>
-        <!--<proguard optimize="true" shrink="true" defaultpackage=""-->
-                  <!--printmapping="false" verbose="false"-->
-                  <!--usemixedcaseclassnames="false" obfuscate="false"-->
-                  <!--overloadaggressively="true" printseeds="false"-->
-                  <!--allowaccessmodification="true" microedition="true">-->
-            <!--<injar dir="${dir.build.classes}"/>-->
-            <!--<outjar dir="${dir.build.obfuscated}"/>-->
-            <!--<libraryjar>-->
-                <!--<pathelement path="${wtk.midpapi}"/>-->
-            <!--</libraryjar>-->
-            <!--<keep name="*" extends="android.app.Activity">-->
-                <!--<method name="*"/>-->
-            <!--</keep>-->
-            <!--<keep name="*" extends="net.intensicode.blockshock.game.objects.Particle">-->
-                <!--<method name="*"/>-->
-            <!--</keep>-->
-        <!--</proguard>-->
+        <proguard optimize="true" shrink="true" defaultpackage=""
+                  printmapping="false" verbose="false"
+                  usemixedcaseclassnames="true" obfuscate="${obfuscate}"
+                  overloadaggressively="false" printseeds="false"
+                  allowaccessmodification="false" microedition="false">
+            <injar dir="${dir.build.classes}"/>
+            <outjar dir="${dir.build.obfuscated}"/>
+            <libraryjar>
+                <pathelement path="${build_libs}"/>
+            </libraryjar>
+            <keep name="*" extends="android.app.Activity">
+                <method name="*"/>
+            </keep>
+            -optimizations !code/simplification/cast
+            -optimizations !code/allocation/variable
+        </proguard>
     </target>
 
     <target name="_obfuscate" depends="_obfuscate_j2me,_obfuscate_android"/>
