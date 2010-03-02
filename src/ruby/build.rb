@@ -34,7 +34,6 @@ def build_instance( config, target, size )
 
     defines = ''
     defines << "-Dwtk.home=#{ENV['WTK_HOME']}" if ENV['WTK_HOME']
-    defines << "-Dtoasted=tested" unless ENV['WTK_HOME']
     commandline = "ant #{defines} release >release.log 2>&1"
 
     success = system( commandline )
