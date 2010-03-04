@@ -280,9 +280,9 @@
     </target>
 
     <target name="_obfuscate_android" if="android">
-        <proguard optimize="true" shrink="true" defaultpackage=""
+        <proguard optimize="${obfuscate}" shrink="${obfuscate}" defaultpackage=""
                   printmapping="false" verbose="false"
-                  usemixedcaseclassnames="true" obfuscate="${obfuscate}"
+                  usemixedcaseclassnames="${obfuscate}" obfuscate="${obfuscate}"
                   overloadaggressively="false" printseeds="false"
                   allowaccessmodification="false" microedition="false">
             <injar dir="${dir.build.classes}"/>
