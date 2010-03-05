@@ -46,7 +46,7 @@ def build_instance( config, target, size )
         end
     end
 
-    FileUtils.rm_f [ 'release.properties', 'release.log' ]
+    FileUtils.rm_f [ 'release.properties', 'release.log', 'keep_config.proguard' ]
 end
 
 def write_release_properties( config, target, screen_size )
@@ -75,12 +75,21 @@ def write_release_properties( config, target, screen_size )
     output_name = name.gsub( / /, '_' )
 
     if symbols.include?(:DEBUG)
+        optimize = false
         obfuscate = false
         debug = true
         jar_suffix << '-DEBUG'
     else
-        obfuscate = true
+        optimize = true
+        obfuscate = symbols.include?(:OBFUSCATE)
         debug = false
+    end
+
+    File.open('keep_config.proguard', 'w') do |file|
+      config.keep.each do |classname_with_package|
+        file.puts "-keep class * extends #{classname_with_package}"
+        file.puts "-keep class #{classname_with_package}"
+      end
     end
 
     template_filepath = File.join( File.dirname( $0 ), 'release_template.erb' )

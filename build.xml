@@ -280,9 +280,9 @@
     </target>
 
     <target name="_obfuscate_android" if="android">
-        <proguard optimize="${obfuscate}" shrink="${obfuscate}" defaultpackage=""
+        <proguard optimize="${optimize}" shrink="${optimize}" defaultpackage=""
                   printmapping="false" verbose="false"
-                  usemixedcaseclassnames="${obfuscate}" obfuscate="${obfuscate}"
+                  usemixedcaseclassnames="${optimize}" obfuscate="${obfuscate}"
                   overloadaggressively="false" printseeds="false"
                   allowaccessmodification="false" microedition="false">
             <injar dir="${dir.build.classes}"/>
@@ -290,10 +290,8 @@
             <libraryjar>
                 <pathelement path="${build_libs}"/>
             </libraryjar>
-            <keep name="*" extends="android.app.Activity">
-                <method name="*"/>
-            </keep>
-            -optimizations !code/simplification/cast
+            @keep_config.proguard
+            -keep class * extends android.app.Activity
             -optimizations !code/allocation/variable
         </proguard>
     </target>

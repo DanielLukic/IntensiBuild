@@ -6,6 +6,7 @@ class Configuration
     attr_accessor :symbols
     attr_accessor :manifest
     attr_accessor :properties
+    attr_accessor :keep
 
     def initialize( filename = nil )
         @config_dir = File.dirname filename
@@ -14,8 +15,9 @@ class Configuration
         @targets = [ Generic_JAVA ]
         @sizes = [ "240x320" ]
         @symbols = ''
-        @manifest = {}
-        @properties = {}
+        @keep = Array.new
+        @manifest = Hash.new
+        @properties = Hash.new
 
         parse filename if filename
 
