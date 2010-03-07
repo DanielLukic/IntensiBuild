@@ -4,6 +4,7 @@
     <application android:icon="@drawable/icon" android:label="${project.name}">
         <activity android:name="${midlet.classname}" android:label="${project.name}" android:launchMode="singleInstance"
                 android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|fontScale">
+            <uses-sdk android:minSdkVersion="3"/>
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
