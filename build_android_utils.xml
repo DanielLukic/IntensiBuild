@@ -32,9 +32,17 @@
     </target>
 
     <target name="android_reinstall" depends="android_init">
-        <exec spawn="false" executable="${android.home}/tools/adb">
+        <exec spawn="false" executable="${android.home}/tools/adb" outputproperty="restart_out">
             <arg line="${device-options} install -r ${android_default_apk}"/>
         </exec>
+        <echo message="${restart_out}"/>
+        <if>
+            <contains string="${restart_out}" substring="INSTALL_PARSE_FAILED_INCONSISTENT_CERTIFICATES"/>
+            <then>
+                <antcall target="android_uninstall"/>
+                <antcall target="android_install"/>
+            </then>
+        </if>
     </target>
 
     <target name="android_start" depends="android_init">
@@ -53,11 +61,11 @@
     </target>
 
     <target name="android_emulator" description="Start the android emulator with log output and shell.">
-        <exec executable="ruby" outputproperty="android.default.avd">
+        <exec executable="ruby" outputproperty="android.default.avd" failifexecutionfails="true" failonerror="true">
             <arg line="${dir.intensibuild}/src/ruby/android_default_avd.rb ${android.home}"/>
         </exec>
         <echo message="${android.default.avd}"/>
-        <exec spawn="false" executable="${android.home}/tools/emulator">
+        <exec spawn="false" executable="${android.home}/tools/emulator" failifexecutionfails="true" failonerror="true">
             <arg line="-avd ${android.default.avd} -shell -logcat *"/>
         </exec>
     </target>
