@@ -139,6 +139,7 @@
     </target>
 
     <target name="_make_build_properties">
+        <property file="version.properties"/>
         <echoproperties destfile="${jad.properties}" failonerror="true"/>
         <replaceregexp byline="true" file="${jad.properties}" match="(.*)=(.*)" replace="{\1}=\2"/>
         <replaceregexp byline="true" file="${jad.properties}" match="(.*)=(.*)" replace="$\1=\2"/>
