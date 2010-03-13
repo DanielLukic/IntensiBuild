@@ -398,6 +398,11 @@
     <target name="_package_android" depends="_collect_assets" if="android">
         <!-- This helped: http://asantoso.wordpress.com/2009/09/15/how-to-build-android-application-package-apk-from-the-command-line-using-the-sdk-tools-continuously-integrated-using-cruisecontrol/ -->
         <copy file="${android.manifest.file}" tofile="${dir.build}/AndroidManifest.xml"/>
+        <property name="dir.build.res" value="${dir.build}/android_standard_resources"/>
+        <copy todir="${dir.build.res}" verbose="true">
+            <fileset dir="${dir.resources.android}" includes="**/*"/>
+        </copy>
+        <copy file="${dir.build.assets}/icon.png" todir="${dir.build.res}/drawable/" overwrite="true"/>
         <exec executable="${android.aapt}">
             <arg value="package"/>
             <arg value="-v"/>
@@ -408,7 +413,7 @@
             <arg value="-I"/>
             <arg value="${android.jar}"/>
             <arg value="-S"/>
-            <arg value="${dir.resources.android}"/>
+            <arg value="${dir.build.res}"/>
             <arg value="-A"/>
             <arg value="${dir.build.assets}"/>
         </exec>
