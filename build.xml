@@ -396,6 +396,12 @@
         </copy>
     </target>
 
+    <target name="_sign_apk">
+        <property file="${dir.intensibuild}/signing_defaults.properties"/>
+        <signjar alias="${signing.alias}" storepass="${signing.storepass}"
+                 keystore="${signing.keystore}" jar="${dir.build.dist}/${jar.basename}.apk"/>
+    </target>
+
     <target name="_package_android" depends="_collect_assets" if="android">
         <!-- This helped: http://asantoso.wordpress.com/2009/09/15/how-to-build-android-application-package-apk-from-the-command-line-using-the-sdk-tools-continuously-integrated-using-cruisecontrol/ -->
         <copy file="${android.manifest.file}" tofile="${dir.build}/AndroidManifest.xml"/>
@@ -420,15 +426,13 @@
         </exec>
         <exec executable="${android.apkbuilder}">
             <arg value="${dir.build.dist}/${jar.basename}.apk"/>
-            <!--<arg value="-u"/>-->
+            <arg value="-u"/>
             <arg value="-z"/>
             <arg value="${dir.build}/AndroidResources.apk"/>
             <arg value="-f"/>
             <arg value="${dex_target}"/>
         </exec>
-        <!--<property file="${dir.intensibuild}/signing_defaults.properties"/>-->
-        <!--<signjar alias="${signing.alias}" storepass="${signing.storepass}"-->
-                 <!--keystore="${signing.keystore}" jar="${dir.build.dist}/${jar.basename}.apk" signedjar="${dir.build.dist}/${jar.basename}-signed.apk"/>-->
+        <antcall target="_sign_apk"/>
     </target>
 
     <target name="_package_j2me" if="j2me">
@@ -585,7 +589,7 @@
         </exec>
 
         <genkey alias="${signing.alias}" storepass="${signing.storepass}" keystore="${signing.keystore}"
-                dname="CN=The.Berlin.Factor, OU=Intensicode, O=Psychocell, C=DE" validity="360">
+                dname="CN=The.Berlin.Factor, OU=Intensicode, O=Psychocell, C=DE" validity="10000">
         </genkey>
     </target>
 
