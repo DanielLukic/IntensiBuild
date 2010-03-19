@@ -271,12 +271,9 @@
             <libraryjar>
                 <pathelement path="${wtk.midpapi}"/>
             </libraryjar>
-            <keep name="*" extends="javax.microedition.midlet.MIDlet">
-                <method name="*"/>
-            </keep>
-            <keep name="*" extends="net.intensicode.blockshock.game.objects.Particle">
-                <method name="*"/>
-            </keep>
+            @keep_config.proguard
+            -keep class * extends javax.microedition.midlet.MIDlet
+            -optimizations !code/allocation/variable
         </proguard>
     </target>
 
