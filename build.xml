@@ -399,17 +399,6 @@
                  keystore="${signing.keystore}" jar="${dir.build.dist}/${jar.basename}.apk"/>
     </target>
 
-    <target name="_align_apk">
-        <rename src="${dir.build.dist}/${jar.basename}.apk" dest="${dir.build.dist}/${jar.basename}.unaligned.apk"/>
-        <exec executable="${android.zipalign}">
-            <arg value="-f"/>
-            <arg value="-v"/>
-            <arg value="4"/>
-            <arg value="${dir.build.dist}/${jar.basename}.unaligned.apk"/>
-            <arg value="${dir.build.dist}/${jar.basename}.apk"/>
-        </exec>
-    </target>
-
     <target name="_package_android" depends="_collect_assets" if="android">
         <!-- This helped: http://asantoso.wordpress.com/2009/09/15/how-to-build-android-application-package-apk-from-the-command-line-using-the-sdk-tools-continuously-integrated-using-cruisecontrol/ -->
         <copy file="${android.manifest.file}" tofile="${dir.build}/AndroidManifest.xml"/>
@@ -441,7 +430,6 @@
             <arg value="${dex_target}"/>
         </exec>
         <antcall target="_sign_apk"/>
-        <antcall target="_align_apk"/>
     </target>
 
     <target name="_package_j2me" if="j2me">
