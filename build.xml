@@ -523,9 +523,7 @@
 
     <target name="rebuild" depends="clean,build" description="Rebuild the system in development mode."/>
 
-    <target name="release" depends="rebuild" description="Build the system in release mode.">
-        <increment_version part="build date"/>
-
+    <target name="release" depends="version:bump:date,version:bump:build,rebuild" description="Build the system in release mode.">
         <copy todir="${dir.release}" verbose="false">
             <fileset dir="${dir.build.dist}"/>
         </copy>
