@@ -47,15 +47,25 @@
     </macrodef>
 
 
-    <path id="android.antlibs">
-        <pathelement path="${android.home}/tools/lib/anttasks.jar" />
-        <pathelement path="${android.home}/tools/lib/sdklib.jar" />
-        <pathelement path="${android.home}/tools/lib/androidprefs.jar" />
-        <pathelement path="${android.home}/tools/lib/apkbuilder.jar" />
-        <pathelement path="${android.home}/tools/lib/jarutils.jar" />
+    <path id="aspectj.antlibs">
+        <pathelement path="${dir.environment}/aspectj/lib/aspectjtools.jar"/>
+        <!--<pathelement path="${dir.environment}/aspectj/lib/aspectjrt.jar"/>-->
+        <!--<pathelement path="${dir.environment}/aspectj/lib/aspectjweaver.jar"/>-->
+        <!--<pathelement path="${dir.environment}/aspectj/lib/org.aspectj.matcher.jar"/>-->
     </path>
 
-    <taskdef resource="net/sf/antcontrib/antcontrib.properties" classpath="${dir.env.libraries}/ant-contrib-1.0b2.jar;"/>
+    <taskdef resource="org/aspectj/tools/ant/taskdefs/aspectjTaskdefs.properties" classpathref="aspectj.antlibs"/>
+
+    <path id="android.antlibs">
+        <pathelement path="${android.home}/tools/lib/anttasks.jar"/>
+        <pathelement path="${android.home}/tools/lib/sdklib.jar"/>
+        <pathelement path="${android.home}/tools/lib/androidprefs.jar"/>
+        <pathelement path="${android.home}/tools/lib/apkbuilder.jar"/>
+        <pathelement path="${android.home}/tools/lib/jarutils.jar"/>
+    </path>
+
+    <taskdef resource="net/sf/antcontrib/antcontrib.properties"
+             classpath="${dir.env.libraries}/ant-contrib-1.0b2.jar;"/>
 
     <taskdef resource="antenna.properties" classpath="${dir.env.libraries}/antenna-bin-0.9.13-psychocell.jar;"/>
     <taskdef resource="proguard/ant/task.properties" classpath="${dir.env.libraries}/proguard-4.5.jar;"/>
@@ -214,7 +224,18 @@
                   classpathref="classpath.build.j2me"/>
     </target>
 
-    <target name="_build_classes" depends="_build_j2me_classes,_build_android_classes"/>
+    <target name="_interweave_timing" if="interweave_timing">
+        <iajc destdir="${dir.build}/aop" debug="true" source="1.3" target="1.3" showWeaveInfo="true">
+            <inpath path="${dir.build.classes}"/>
+            <sourceroots path="${dir.intensibuild}/src/aspectj"/>
+            <classpath path="${dir.environment}/aspectj/lib/aspectjrt.jar"/>
+        </iajc>
+        <unzip src="${dir.environment}/aspectj/lib/aspectjrt.jar" dest="${dir.build}/aop"/>
+        <move file="${dir.build.classes}" tofile="${dir.build.classes}.bak"/>
+        <move file="${dir.build}/aop" tofile="${dir.build.classes}"/>
+    </target>
+
+    <target name="_build_classes" depends="_build_j2me_classes,_build_android_classes,_interweave_timing"/>
 
     <target name="_build_release" depends="_init">
         <echo message="Building releases: ${release.configurations}"/>
@@ -523,7 +544,8 @@
 
     <target name="rebuild" depends="clean,build" description="Rebuild the system in development mode."/>
 
-    <target name="release" depends="version:bump:date,version:bump:build,rebuild" description="Build the system in release mode.">
+    <target name="release" depends="version:bump:date,version:bump:build,rebuild"
+            description="Build the system in release mode.">
         <copy todir="${dir.release}" verbose="false">
             <fileset dir="${dir.build.dist}"/>
         </copy>
