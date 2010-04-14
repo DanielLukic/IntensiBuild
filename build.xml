@@ -55,7 +55,7 @@
         <pathelement path="${android.home}/tools/lib/jarutils.jar" />
     </path>
 
-    <taskdef resource="net/sf/antcontrib/antcontrib.properties" classpath="${dir.env.libraries}/ant-contrib-1.0b2.jar"/>
+    <taskdef resource="net/sf/antcontrib/antcontrib.properties" classpath="${dir.env.libraries}/ant-contrib-1.0b2.jar;"/>
 
     <taskdef resource="antenna.properties" classpath="${dir.env.libraries}/antenna-bin-0.9.13-psychocell.jar;"/>
     <taskdef resource="proguard/ant/task.properties" classpath="${dir.env.libraries}/proguard-4.5.jar;"/>
@@ -72,7 +72,7 @@
     <taskdef name="apkbuilder" classname="com.android.ant.ApkBuilderTask" classpathref="android.antlibs"/>
 
     <taskdef name="groovy" classname="org.codehaus.groovy.ant.Groovy"
-             classpath="${dir.env.groovy}/groovy-all-1.7.0.jar"/>
+             classpath="${dir.env.groovy}/groovy-all-1.7.0.jar;"/>
 
 
     <path id="classpath.libraries.android">
