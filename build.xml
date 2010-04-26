@@ -281,7 +281,7 @@
         </junit>
     </target>
 
-    <target name="_obfuscate_j2me" if="j2me">
+    <target name="_obfuscate_j2me" if="j2me" unless="skip_proguard">
         <proguard optimize="true" shrink="true" defaultpackage=""
                   printmapping="false" verbose="false"
                   usemixedcaseclassnames="false" obfuscate="${obfuscate}"
@@ -298,7 +298,7 @@
         </proguard>
     </target>
 
-    <target name="_obfuscate_android" if="android">
+    <target name="_obfuscate_android" if="android" unless="skip_proguard">
         <proguard optimize="${optimize}" shrink="${optimize}" defaultpackage=""
                   printmapping="false" verbose="false"
                   usemixedcaseclassnames="${optimize}" obfuscate="${obfuscate}"
@@ -315,7 +315,13 @@
         </proguard>
     </target>
 
-    <target name="_obfuscate" depends="_obfuscate_j2me,_obfuscate_android"/>
+    <target name="_skip_proguard" if="skip_proguard">
+        <copy todir="${dir.build.obfuscated}">
+            <fileset dir="${dir.build.classes}" includes="**/*"/>
+        </copy>
+    </target>
+
+    <target name="_obfuscate" depends="_obfuscate_j2me,_obfuscate_android,_skip_proguard"/>
 
     <target name="_preverify_android" if="android">
         <condition property="dex_debug" value="--debug" else="">
