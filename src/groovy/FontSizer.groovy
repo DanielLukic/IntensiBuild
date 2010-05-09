@@ -34,10 +34,11 @@ class FontSizer
 
   public static void process(aInputFile, aOutputFile)
   {
+    println "processing ${aInputFile} into ${aOutputFile}"
+
     def sizer = new FontSizer(16, 8)
 
     sizer.prepare(aInputFile)
-    println "processing ${aInputFile} into ${aOutputFile}"
 
     def sizes = sizer.determineSizes()
 
