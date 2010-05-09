@@ -24,6 +24,12 @@ class Configuration
         raise "Missing value for name" unless @name
     end
 
+    def override_property( properties_hash )
+      properties_hash.each do |key,value|
+        @properties[key] = value
+      end
+    end
+
     def valid?
         name != nil && targets.size != 0 && sizes.size != 0
     end
