@@ -30,6 +30,25 @@ class Configuration
       end
     end
 
+    def screen_orientation(mode_id)
+      @symbols.delete :ORIENTATION_DYNAMIC
+      @symbols.delete :ORIENTATION_PORTRAIT
+      @symbols.delete :ORIENTATION_LANDSCAPE
+      override_property 'config_orientation_hook' => ''
+      override_property 'screen_orientation_mode' => 'unspecified'
+      if mode_id == :dynamic
+        override_property 'config_orientation_hook' => '|orientation'
+        override_property 'screen_orientation_mode' => 'unspecified'
+        @symbols << :ORIENTATION_DYNAMIC
+      elsif mode_id == :landscape
+        override_property 'screen_orientation_mode' => 'landscape'
+        @symbols << :ORIENTATION_LANDSCAPE
+      elsif mode_id == :portrait
+        override_property 'screen_orientation_mode' => 'portrait'
+        @symbols << :ORIENTATION_PORTRAIT
+      end
+    end
+
     def valid?
         name != nil && targets.size != 0 && sizes.size != 0
     end

@@ -6,8 +6,9 @@
     <uses-sdk android:minSdkVersion="3" android:targetSdkVersion="4"/>
     <!--<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>-->
     <application android:icon="@drawable/icon" android:label="${android.application.name}">
-        <activity android:name="${midlet.classname}" android:label="${android.activity.name}" android:launchMode="singleInstance"
-                  android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|fontScale">
+        <activity android:name="${midlet.classname}" android:label="${android.activity.name}"
+                  android:launchMode="singleInstance" android:screenOrientation="${screen_orientation_mode}"
+                  android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|fontScale${config_orientation_hook}">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
