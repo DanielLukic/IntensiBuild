@@ -3,7 +3,7 @@
 apk_path = ARGV.shift
 raise "missing apk argument" unless apk_path
 
-properties_path = apk_path.sub /\.apk$/, '.properties'
+properties_path = apk_path.sub(/\.apk$/, '.properties').sub(/\.unaligned/, '')
 properties = File.readlines(properties_path)
 
 classname_line = properties.select { |line| line =~ /midlet\.classname/ }.first.chomp
