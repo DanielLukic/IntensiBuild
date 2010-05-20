@@ -46,8 +46,11 @@
     </target>
 
     <target name="android_start" depends="android_init">
+        <exec spawn="false" executable="ruby" outputproperty="android.intent" failonerror="true" failifexecutionfails="true">
+            <arg line="${dir.intensibuild}/src/ruby/determine_intent.rb ${android_default_apk}"/>
+        </exec>
         <exec spawn="false" executable="${android.home}/tools/adb">
-            <arg line="${device-options} shell am start -a android.intent.action.MAIN -n ${midlet.package}/.${midlet.classname}"/>
+            <arg line="${device-options} shell am start -a android.intent.action.MAIN -n ${android.intent}"/>
         </exec>
     </target>
 
