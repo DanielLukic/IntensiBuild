@@ -8,7 +8,6 @@ namespace :check do
   end
 
   COMMANDS.each do |command|
-    desc "Check if #{command} is installed."
     task command.to_sym do
       check command
     end
