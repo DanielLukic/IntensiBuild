@@ -8,8 +8,12 @@ end
 
 $LOAD_PATH << "#{INTENSIBUILD_FOLDER}/src/ruby"
 
-Dir.glob("#{INTENSIBUILD_FOLDER}/src/ruby/tasks/**/*.rb").each do |tasks|
-  require tasks.sub("#{INTENSIBUILD_FOLDER}/src/ruby/", '')
+Dir.glob("#{INTENSIBUILD_FOLDER}/../*/src/ruby/tasks/**/*.rb").sort.each do |tasks|
+  load tasks
+end
+
+Dir.glob("#{INTENSIBUILD_FOLDER}/../*/lib/rake/**/*.rb").sort.each do |tasks|
+  load tasks
 end
 
 task :default => 'release:do'
