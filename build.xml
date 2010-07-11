@@ -69,12 +69,11 @@
 
     <taskdef resource="antenna.properties" classpath="${dir.env.libraries}/antenna-bin-0.9.13-psychocell.jar;"/>
     <taskdef resource="proguard/ant/task.properties" classpath="${dir.env.libraries}/proguard-4.5.jar;"/>
-    <taskdef resource="junit/task.properties" classpath="${file.junit.jar};${file.ant-junit.jar}"/>
 
     <taskdef name="junit" classname="org.apache.tools.ant.taskdefs.optional.junit.JUnitTask">
         <classpath>
-            <pathelement location="${dir.env.junit}/ant-junit.jar"/>
-            <pathelement location="${dir.env.junit}/junit-3.8.1.jar"/>
+            <pathelement location="${dir.env.test}/ant-junit.jar"/>
+            <pathelement location="${dir.env.test}/junit-3.8.1.jar"/>
         </classpath>
     </taskdef>
 
@@ -101,6 +100,7 @@
         <path refid="classpath.libraries.android"/>
         <pathelement location="${dir.build.classes}"/>
         <pathelement path="${build_libs}"/>
+        <pathelement location="${android.jar}"/>
     </path>
 
     <path id="classpath.build.j2me">
@@ -116,12 +116,11 @@
     </path>
 
     <path id="classpath.build.runme">
-        <!--<pathelement location="${dir.build.classes}"/>-->
-        <!--<pathelement path="${build_libs}"/>-->
+        <fileset id="libraries.test" dir="${dir.runme.libs}" includes="*.jar"/>
     </path>
 
     <path id="classpath.test">
-        <pathelement location="${file.junit.jar}"/>
+        <fileset id="libraries.test" dir="${dir.env.test}" includes="*.jar"/>
         <pathelement location="${dir.build.tests}"/>
         <pathelement location="${dir.tests}"/>
         <path refid="classpath.build.android"/>
@@ -263,9 +262,7 @@
         </jar>
     </target>
 
-    <target name="_run_tests" depends="_build_tests,_build_runme">
-        <!-- This needs RunME to provide all the emulation classes for the MIDP APIs. -->
-        <!-- That's why _build_runme is called as a dependency. -->
+    <target name="_run_tests" depends="_build_tests">
         <dirname property="project.home" file="${ant.file}"/>
         <mkdir dir="${dir.release}/junit"/>
         <junit printsummary="yes" haltonfailure="yes" showoutput="true" dir="${project.home}">
@@ -279,6 +276,17 @@
                 </fileset>
             </batchtest>
         </junit>
+    </target>
+
+    <target name="_run_specs"> <!-- depends="_enable_debug,_build_classes"> -->
+        <!-- This obviously needs jruby and jruby -S gem install rspec to run. -->
+        <exec executable="jruby" failonerror="true" failifexecutionfails="true">
+            <arg line="-J-cp build/classes"/>
+            <arg line="-J-cp ${android.jar}"/>
+            <arg line="-S spec"/>
+            <arg line="modules/Tests/spec"/>
+            <arg line="-b -Lmtime -t1 -c -fo"/>
+        </exec>
     </target>
 
     <target name="_obfuscate_j2me" if="j2me" unless="skip_proguard">
@@ -559,6 +567,8 @@
     <target name="build" depends="_init,_package_application" description="Continous build (without clean)."/>
 
     <target name="test" depends="_run_tests" description="Run all tests."/>
+
+    <target name="spec" depends="_run_specs" description="Run all specs."/>
 
     <target name="rebuild" depends="clean,build" description="Rebuild the system in development mode."/>
 
