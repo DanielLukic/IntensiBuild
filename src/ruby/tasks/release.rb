@@ -1,3 +1,11 @@
+
+desc "Build a specific release or the first configuration matching config/*240x320*.config."
+task :release, :configuration, :needs => 'resources:font_size_files' do |task, args|
+  configurations = args[:configuration]
+  configurations ||= default_configuration
+  release [configurations].flatten
+end
+
 namespace :release do
 
   def all_configurations
@@ -21,13 +29,6 @@ namespace :release do
   desc "Build all releases matching config/*.config."
   task :all do
     Rake::Task['release:do'].invoke all_configurations
-  end
-
-  desc "Build a specific release or the first configuration matching config/*240x320*.config."
-  task :do, :configuration, :needs => 'resources:font_size_files' do |task, args|
-    configurations = args[:configuration]
-    configurations ||= default_configuration
-    release [configurations].flatten
   end
 
 end
