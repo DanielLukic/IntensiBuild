@@ -412,18 +412,18 @@
             </fileset>
             <fileset dir="${dir.resources.target}">
                 <include name="*"/>
-                <include name="sound/*${target.sound_suffix}"/>
-                <include name="music/*${target.music_suffix}"/>
+                <include name="_sound/*${target.sound_suffix}"/>
+                <include name="_music/*${target.music_suffix}"/>
             </fileset>
             <fileset dir="${dir.resources.platform}">
                 <include name="*"/>
-                <include name="sound/*${target.sound_suffix}"/>
-                <include name="music/*${target.music_suffix}"/>
+                <include name="_sound/*${target.sound_suffix}"/>
+                <include name="_music/*${target.music_suffix}"/>
             </fileset>
             <fileset dir="${dir.resources.root}">
                 <include name="*"/>
-                <include name="sound/*${target.sound_suffix}"/>
-                <include name="music/*${target.music_suffix}"/>
+                <include name="_sound/*${target.sound_suffix}"/>
+                <include name="_music/*${target.music_suffix}"/>
             </fileset>
         </copy>
     </target>
