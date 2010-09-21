@@ -14,7 +14,7 @@ class Configuration
         @name = nil
         @targets = [ Generic_JAVA ]
         @sizes = [ "240x320" ]
-        @symbols = ''
+        @symbols = Array.new
         @keep = Array.new
         @manifest = Hash.new
         @properties = Hash.new
