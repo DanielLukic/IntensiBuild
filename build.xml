@@ -406,24 +406,28 @@
     <target name="_create_classes" depends="_build_sources,_build_classes,_merge_libs,_obfuscate,_preverify"/>
 
     <target name="_collect_assets" depends="_init">
+        <echo message="Sound: ${target.sound_suffix} Music: ${target.music_suffix}"/>
+        <echo message="Target resources: ${dir.resources.target}"/>
+        <echo message="Platform resources: ${dir.resources.platform}"/>
+        <echo message="Root resources: ${dir.resources.root}"/>
         <copy todir="${dir.build.assets}" overwrite="false" verbose="true">
             <fileset dir="${dir.resources.target}/${screen.size}">
                 <include name="**/*"/>
             </fileset>
             <fileset dir="${dir.resources.target}">
                 <include name="*"/>
-                <include name="_sound/*${target.sound_suffix}"/>
-                <include name="_music/*${target.music_suffix}"/>
+                <include name="${folder.sound}/*${target.sound_suffix}"/>
+                <include name="${folder.music}/*${target.music_suffix}"/>
             </fileset>
             <fileset dir="${dir.resources.platform}">
                 <include name="*"/>
-                <include name="_sound/*${target.sound_suffix}"/>
-                <include name="_music/*${target.music_suffix}"/>
+                <include name="${folder.sound}/*${target.sound_suffix}"/>
+                <include name="${folder.music}/*${target.music_suffix}"/>
             </fileset>
             <fileset dir="${dir.resources.root}">
                 <include name="*"/>
-                <include name="_sound/*${target.sound_suffix}"/>
-                <include name="_music/*${target.music_suffix}"/>
+                <include name="${folder.sound}/*${target.sound_suffix}"/>
+                <include name="${folder.music}/*${target.music_suffix}"/>
             </fileset>
         </copy>
     </target>
@@ -485,23 +489,23 @@
             <fileset dir="${dir.build.preverified}"/>
             <fileset dir="${dir.resources.target}/${screen.size}">
                 <include name="*"/>
-                <include name="sound/*${target.sound_suffix}"/>
-                <include name="music/*${target.music_suffix}"/>
+                <include name="${folder.sound}/*${target.sound_suffix}"/>
+                <include name="${folder.music}/*${target.music_suffix}"/>
             </fileset>
             <fileset dir="${dir.resources.target}">
                 <include name="*"/>
-                <include name="sound/*${target.sound_suffix}"/>
-                <include name="music/*${target.music_suffix}"/>
+                <include name="${folder.sound}/*${target.sound_suffix}"/>
+                <include name="${folder.music}/*${target.music_suffix}"/>
             </fileset>
             <fileset dir="${dir.resources.platform}">
                 <include name="*"/>
-                <include name="sound/*${target.sound_suffix}"/>
-                <include name="music/*${target.music_suffix}"/>
+                <include name="${folder.sound}/*${target.sound_suffix}"/>
+                <include name="${folder.music}/*${target.music_suffix}"/>
             </fileset>
             <fileset dir="${dir.resources.root}">
                 <include name="*"/>
-                <include name="sound/*${target.sound_suffix}"/>
-                <include name="music/*${target.music_suffix}"/>
+                <include name="${folder.sound}/*${target.sound_suffix}"/>
+                <include name="${folder.music}/*${target.music_suffix}"/>
             </fileset>
         </jar>
         <!-- Update again to set MIDlet-Jar-Size attribute. -->
@@ -522,18 +526,18 @@
             <fileset dir="${dir.build.classes}"/>
             <fileset dir="${dir.resources.target}/${screen.size}">
                 <include name="*"/>
-                <include name="sound/*${target.sound_suffix}"/>
-                <include name="music/*${target.music_suffix}"/>
+                <include name="${folder.sound}/*${target.sound_suffix}"/>
+                <include name="${folder.music}/*${target.music_suffix}"/>
             </fileset>
             <fileset dir="${dir.resources.target}">
                 <include name="*"/>
-                <include name="sound/*${target.sound_suffix}"/>
-                <include name="music/*${target.music_suffix}"/>
+                <include name="${folder.sound}/*${target.sound_suffix}"/>
+                <include name="${folder.music}/*${target.music_suffix}"/>
             </fileset>
             <fileset dir="${dir.resources.root}">
                 <include name="*"/>
-                <include name="sound/*${target.sound_suffix}"/>
-                <include name="music/*${target.music_suffix}"/>
+                <include name="${folder.sound}/*${target.sound_suffix}"/>
+                <include name="${folder.music}/*${target.music_suffix}"/>
             </fileset>
             <manifest>
                 <attribute name="Main-Class" value="${main.class}"/>
