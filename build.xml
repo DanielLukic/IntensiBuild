@@ -414,16 +414,22 @@
             <fileset dir="${dir.resources.target}/${screen.size}">
                 <include name="**/*"/>
             </fileset>
+        </copy>
+        <copy todir="${dir.build.assets}" overwrite="false" verbose="true">
             <fileset dir="${dir.resources.target}">
                 <include name="*"/>
                 <include name="${folder.sound}/*${target.sound_suffix}"/>
                 <include name="${folder.music}/*${target.music_suffix}"/>
             </fileset>
+        </copy>
+        <copy todir="${dir.build.assets}" overwrite="false" verbose="true">
             <fileset dir="${dir.resources.platform}">
                 <include name="*"/>
                 <include name="${folder.sound}/*${target.sound_suffix}"/>
                 <include name="${folder.music}/*${target.music_suffix}"/>
             </fileset>
+        </copy>
+        <copy todir="${dir.build.assets}" overwrite="false" verbose="true">
             <fileset dir="${dir.resources.root}">
                 <include name="*"/>
                 <include name="${folder.sound}/*${target.sound_suffix}"/>
