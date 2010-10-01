@@ -454,12 +454,12 @@
     </target>
 
     <target name="_align_apk">
-        <rename src="${dir.build.dist}/${jar.basename}.apk" dest="${dir.build.dist}/${jar.basename}.unaligned.apk"/>
+        <rename src="${dir.build.dist}/${jar.basename}.apk" dest="${dir.build}/${jar.basename}.unaligned.apk"/>
         <exec executable="${android.zipalign}">
             <arg value="-f"/>
             <arg value="-v"/>
             <arg value="4"/>
-            <arg value="${dir.build.dist}/${jar.basename}.unaligned.apk"/>
+            <arg value="${dir.build}/${jar.basename}.unaligned.apk"/>
             <arg value="${dir.build.dist}/${jar.basename}.apk"/>
         </exec>
     </target>
