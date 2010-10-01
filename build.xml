@@ -12,6 +12,8 @@
     <property name="screen.size" value="Default"/>
     <property name="screen.size.suffix" value=""/>
     <property name="screen.size.full" value="${screen.size}${screen.size.suffix}"/>
+    <property name="screen.size.subfolder" value=""/>
+    <property name="screen.size.full.subfolder" value="${screen.size.full}/${screen.size.subfolder}"/>
     <property name="project.name" value="${ant.project.name}"/>
     <property name="release.configurations" value=""/>
 
@@ -413,6 +415,11 @@
         <echo message="Platform resources: ${dir.resources.platform}"/>
         <echo message="Root resources: ${dir.resources.root}"/>
         <copy todir="${dir.build.assets}" overwrite="false" verbose="true">
+            <fileset dir="${dir.resources.target}/${screen.size.full.subfolder}">
+                <include name="**/*"/>
+            </fileset>
+        </copy>
+        <copy todir="${dir.build.assets}" overwrite="false" verbose="true">
             <fileset dir="${dir.resources.target}/${screen.size.full}">
                 <include name="**/*"/>
             </fileset>
@@ -495,6 +502,11 @@
         <antcall target="_update_jad"/>
         <jar jarfile="${jar.file}" manifest="${jad.file}" duplicate="preserve">
             <fileset dir="${dir.build.preverified}"/>
+            <fileset dir="${dir.resources.target}/${screen.size.full.subfolder}">
+                <include name="*"/>
+                <include name="${folder.sound}/*${target.sound_suffix}"/>
+                <include name="${folder.music}/*${target.music_suffix}"/>
+            </fileset>
             <fileset dir="${dir.resources.target}/${screen.size.full}">
                 <include name="*"/>
                 <include name="${folder.sound}/*${target.sound_suffix}"/>
@@ -532,6 +544,11 @@
         <delete file="${jar.runme}" failonerror="false"/>
         <jar jarfile="${jar.runme}" duplicate="preserve">
             <fileset dir="${dir.build.classes}"/>
+            <fileset dir="${dir.resources.target}/${screen.size.full.subfolder}">
+                <include name="*"/>
+                <include name="${folder.sound}/*${target.sound_suffix}"/>
+                <include name="${folder.music}/*${target.music_suffix}"/>
+            </fileset>
             <fileset dir="${dir.resources.target}/${screen.size.full}">
                 <include name="*"/>
                 <include name="${folder.sound}/*${target.sound_suffix}"/>
