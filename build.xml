@@ -421,7 +421,7 @@
         </copy>
         <copy todir="${dir.build.assets}" overwrite="false" verbose="true">
             <fileset dir="${dir.resources.target}/${screen.size.full}">
-                <include name="**/*"/>
+                <include name="*"/>
             </fileset>
         </copy>
         <copy todir="${dir.build.assets}" overwrite="false" verbose="true">
@@ -500,10 +500,11 @@
 
     <target name="_package_j2me" if="j2me">
         <antcall target="_update_jad"/>
+        /* TODO: Replace this with _collect_assets, too? */
         <jar jarfile="${jar.file}" manifest="${jad.file}" duplicate="preserve">
             <fileset dir="${dir.build.preverified}"/>
             <fileset dir="${dir.resources.target}/${screen.size.full.subfolder}">
-                <include name="*"/>
+                <include name="**/*"/>
                 <include name="${folder.sound}/*${target.sound_suffix}"/>
                 <include name="${folder.music}/*${target.music_suffix}"/>
             </fileset>
@@ -542,10 +543,11 @@
 
     <target name="_package_runme" depends="_build_runme,_merge_libs_j2me">
         <delete file="${jar.runme}" failonerror="false"/>
+        /* TODO: Replace this with _collect_assets, too? */
         <jar jarfile="${jar.runme}" duplicate="preserve">
             <fileset dir="${dir.build.classes}"/>
             <fileset dir="${dir.resources.target}/${screen.size.full.subfolder}">
-                <include name="*"/>
+                <include name="**/*"/>
                 <include name="${folder.sound}/*${target.sound_suffix}"/>
                 <include name="${folder.music}/*${target.music_suffix}"/>
             </fileset>
