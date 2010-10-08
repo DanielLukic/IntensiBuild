@@ -7,7 +7,7 @@
                      android:smallScreens="${android.smallScreens}"
                      android:anyDensity="${android.anyDensity}"/>
 
-    <uses-configuration android:reqTouchScreen="finger"/>
+    <!--<uses-configuration android:reqTouchScreen="finger"/>-->
     <!--<uses-configuration android:reqFiveWayNav="false" android:reqTouchScreen="finger"/>-->
     <!--<uses-configuration android:reqNavigation="true" android:reqTouchScreen="finger"/>-->
 
