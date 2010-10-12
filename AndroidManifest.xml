@@ -12,7 +12,9 @@
     <!--<uses-configuration android:reqNavigation="true" android:reqTouchScreen="finger"/>-->
 
     <uses-sdk android:minSdkVersion="3" android:targetSdkVersion="4"/>
+
     <!--<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>-->
+
     <application android:icon="@drawable/icon" android:label="${android.application.name}" android:debuggable="${android.debuggable}">
         <activity android:name="${midlet.classname}" android:label="${android.activity.name}"
                   android:launchMode="singleInstance" android:screenOrientation="${screen_orientation_mode}"
