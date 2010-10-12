@@ -62,6 +62,15 @@
         </exec>
     </target>
 
+    <target name="android_traceview" depends="android_use_device">
+        <exec spawn="false" executable="${android.home}/tools/adb" failonerror="true">
+            <arg line="${device-options} pull /sdcard/intensigame/calls.trace /tmp/calls.trace"/>
+        </exec>
+        <exec spawn="false" executable="${android.home}/tools/traceview" failonerror="true">
+            <arg line="/tmp/calls.trace"/>
+        </exec>
+    </target>
+
     <target name="android_emulator" description="Start the android emulator with log output and shell.">
         <exec executable="ruby" outputproperty="android.default.avd" failifexecutionfails="true" failonerror="true">
             <arg line="${dir.intensibuild}/src/ruby/android_default_avd.rb ${android.home}"/>
