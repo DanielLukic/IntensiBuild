@@ -202,10 +202,8 @@
         <property name="date" value="UNKNOWN"/>
 
         <echo message="Defined symbols: ${defined_symbols}"/>
-        <wtkpreprocess srcdir="${dir.mod.intensigame}/${dir.sources}" symbols="${defined_symbols}"
-                       destdir="${dir.build.sources}"/>
-        <wtkpreprocess srcdir="${dir.mod.intensime}/${dir.sources}" symbols="${defined_symbols}"
-                       destdir="${dir.build.sources}"/>
+        <wtkpreprocess srcdir="${dir.mod.intensigame}/${dir.sources}" symbols="${defined_symbols}" destdir="${dir.build.sources}"/>
+        <wtkpreprocess srcdir="${dir.mod.intensime}/${dir.sources}" symbols="${defined_symbols}" destdir="${dir.build.sources}"/>
         <wtkpreprocess srcdir="${dir.sources}" symbols="${defined_symbols}" destdir="${dir.build.sources}"/>
     </target>
 

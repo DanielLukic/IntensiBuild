@@ -54,10 +54,9 @@
         </exec>
     </target>
 
-    <target name="android_restart" depends="android_reinstall,android_start"
-            description="Redeploy and restart application."/>
+    <target name="android_restart" depends="android_reinstall,android_start" description="Redeploy and restart application."/>
 
-    <target name="android_logcat" depends="android_use_emulator">
+    <target name="android_logcat" depends="android_use_device">
         <exec spawn="false" executable="${android.home}/tools/adb">
             <arg line="${device-options} logcat"/>
         </exec>
