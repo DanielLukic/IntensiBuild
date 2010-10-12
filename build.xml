@@ -462,7 +462,7 @@
         </exec>
     </target>
 
-    <target name="_package_android" depends="_collect_assets" if="android">
+    <target name="_package_android" depends="_collect_assets,_build_native_libs" if="android">
         <!-- This helped: http://asantoso.wordpress.com/2009/09/15/how-to-build-android-application-package-apk-from-the-command-line-using-the-sdk-tools-continuously-integrated-using-cruisecontrol/ -->
         <copy file="${android.manifest.file}" tofile="${dir.build}/AndroidManifest.xml"/>
         <property name="dir.build.res" value="${dir.build}/android_standard_resources"/>
@@ -489,11 +489,17 @@
             <arg value="-u"/>
             <arg value="-z"/>
             <arg value="${dir.build}/AndroidResources.apk"/>
+            <arg value="-nf"/>
+            <arg value="modules/IntensiDroid/libs"/>
             <arg value="-f"/>
             <arg value="${dex_target}"/>
         </exec>
         <antcall target="_sign_apk"/>
         <antcall target="_align_apk"/>
+    </target>
+
+    <target name="_build_native_libs">
+        <exec dir="${dir.mod.intensidroid}" executable="/usr/local/android-ndk/ndk-build"/>
     </target>
 
     <target name="_package_j2me" if="j2me">
