@@ -174,11 +174,16 @@
         <property name="date" value="UNKNOWN"/>
 
         <echo message="Defined symbols: ${defined_symbols}"/>
-        <wtkpreprocess srcdir="${dir.mod.intensigame}/${dir.sources}" symbols="${defined_symbols}"
-                       destdir="${dir.build.sources}"/>
-        <wtkpreprocess srcdir="${dir.mod.intensidroid}/${dir.sources}" symbols="${defined_symbols}"
-                       destdir="${dir.build.sources}"/>
+        <wtkpreprocess srcdir="${dir.mod.intensigame}/${dir.sources}" symbols="${defined_symbols}" destdir="${dir.build.sources}"/>
+        <wtkpreprocess srcdir="${dir.mod.intensidroid}/${dir.sources}" symbols="${defined_symbols}" destdir="${dir.build.sources}"/>
         <wtkpreprocess srcdir="${dir.sources}" symbols="${defined_symbols}" destdir="${dir.build.sources}"/>
+
+        <if>
+            <available file="${dir.sources}-android"/>
+            <then>
+                <wtkpreprocess srcdir="${dir.sources}-android" symbols="${defined_symbols}" destdir="${dir.build.sources}" if="android"/>
+            </then>
+        </if>
 
         <copy file="${android.manifest.file}" tofile="${dir.build}/AndroidManifest.xml"/>
 
