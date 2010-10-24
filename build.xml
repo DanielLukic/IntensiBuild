@@ -89,7 +89,10 @@
 
 
     <path id="classpath.libraries.android">
-        <fileset id="libraries.android" dir="${dir.libraries}/android" includes="*.jar"/>
+        <fileset id="libraries.android" dir="${basedir}">
+            <include name="${dir.libraries}/android/*.jar"/>
+            <include name="lib/android/*.jar"/>
+        </fileset>
     </path>
 
     <path id="classpath.libraries.j2me">
