@@ -84,8 +84,7 @@
     <taskdef name="aaptexec" classname="com.android.ant.AaptExecLoopTask" classpathref="android.antlibs"/>
     <taskdef name="apkbuilder" classname="com.android.ant.ApkBuilderTask" classpathref="android.antlibs"/>
 
-    <taskdef name="groovy" classname="org.codehaus.groovy.ant.Groovy"
-             classpath="${dir.env.groovy}/groovy-all-1.7.0.jar;"/>
+    <taskdef name="groovy" classname="org.codehaus.groovy.ant.Groovy" classpath="${dir.env.groovy}/groovy-all-1.7.0.jar;"/>
 
 
     <path id="classpath.libraries.android">
