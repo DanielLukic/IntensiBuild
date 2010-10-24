@@ -9,8 +9,6 @@ class Configuration
     attr_accessor :keep
 
     def initialize( filename = nil )
-        @config_dir = File.dirname filename
-
         @name = nil
         @targets = [ Generic_JAVA ]
         @sizes = [ "240x320" ]
@@ -22,6 +20,10 @@ class Configuration
         parse filename if filename
 
         raise "Missing value for name" unless @name
+    end
+
+    def get_property( property_name )
+      @properties[property_name]
     end
 
     def override_property( properties_hash )
@@ -54,10 +56,13 @@ class Configuration
     end
 
     def load_config( filename )
-      parse( File.join( @config_dir, filename ) )
+      puts "load_config #{filename} in '#{@config_dir}'"
+      parse File.join(@config_dir,filename)
     end
 
     def parse( filename )
+        saved_config_dir = @config_dir
+        @config_dir = File.dirname(filename)
         File.open( filename ) do |file|
             while line = file.gets
                 next if line.strip!.empty?
@@ -65,6 +70,7 @@ class Configuration
                 eval line
             end
         end
+        @config_dir = saved_config_dir
     end
 end
 
