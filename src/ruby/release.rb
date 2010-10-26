@@ -20,8 +20,11 @@ ARGV.each do |filename|
     config = nil
 
     begin
-        valid_filename = determine_config_filename( filename )
-        config = Configuration.new valid_filename
+        config_name = filename.sub(/:.*/,'')
+        facets = filename.sub(/[^:]*:/, '').split(':') - [config_name]
+        valid_filename = determine_config_filename(config_name)
+        config = Configuration.new(valid_filename)
+        facets.each {|facet| config.load_config File.join('facet',facet + '.rb')}
         raise "Unknown problem" unless config.valid?
     rescue StandardError => e
         puts
