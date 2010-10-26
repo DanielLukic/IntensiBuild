@@ -57,20 +57,16 @@ class Configuration
 
     def load_config( filename )
       puts "load_config #{filename} in '#{@config_dir}'"
+      filename << '.rb' unless filename =~ /\.rb$/
       parse File.join(@config_dir,filename)
     end
 
     def parse( filename )
         saved_config_dir = @config_dir
         @config_dir = File.dirname(filename)
-        File.open( filename ) do |file|
-            while line = file.gets
-                next if line.strip!.empty?
-                next if line =~ /^\s*\#/
-                eval line
-            end
-        end
-        @config_dir = saved_config_dir
+        config = File.read(filename)
+        instance_eval config, filename
+        @config_dir = saved_config_dir if saved_config_dir
     end
 end
 
