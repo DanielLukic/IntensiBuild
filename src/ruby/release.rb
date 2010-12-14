@@ -1,7 +1,7 @@
 
-require File.join( File.dirname( $0 ), 'build.rb' )
-require File.join( File.dirname( $0 ), 'configuration.rb' )
-require File.join( File.dirname( $0 ), 'target.rb' )
+load File.join( File.dirname( $0 ), 'build.rb' )
+load File.join( File.dirname( $0 ), 'configuration.rb' )
+load File.join( File.dirname( $0 ), 'target.rb' )
 
 
 
