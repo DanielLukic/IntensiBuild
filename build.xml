@@ -221,7 +221,7 @@
         <echo message="Debug? ${debug}"/>
         <javac target="1.5" debug="${debug}" encoding="ascii"
                srcdir="${dir.build.sources}" destdir="${dir.build.classes}"
-               classpathref="classpath.build.android"/>
+               classpathref="classpath.build.android" includeantruntime="false"/>
     </target>
 
     <target name="_build_j2me_classes" depends="_build_sources" if="j2me">
