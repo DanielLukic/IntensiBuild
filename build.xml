@@ -161,8 +161,11 @@
     </target>
 
     <target name="_update_android_manifest" depends="_make_build_properties" if="android">
-        <copy file="${android.manifest.template}" tofile="${android.manifest.file}" overwrite="true"/>
-        <replace replacefilterfile="${jad.properties}" file="${android.manifest.file}"/>
+        <copy file="${android.manifest.template}" tofile="${android.manifest.file}.erubis" overwrite="true"/>
+        <replace replacefilterfile="${jad.properties}" file="${android.manifest.file}.erubis"/>
+        <exec executable="erubis" failonerror="true" failifexecutionfails="true" output="${android.manifest.file}">
+            <arg line="--pi ${android.manifest.file}.erubis"/>
+        </exec>
     </target>
 
     <target name="_build_android_sources" depends="_init,_update_android_manifest" if="android">
