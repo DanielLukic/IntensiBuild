@@ -1,28 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
+<?rb
+        symbols = Hash.new
+        "${defined_symbols}".split(',').each { |symbol| symbols[symbol.to_sym] = true }
+
+        app_name = %q[android:name="${android_application_name}"] if symbols[:ACRA]
+?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android" package="${midlet.package}"
-          android:versionCode="${build}" android:versionName="${version}.${build}"
-          android:installLocation="auto">
-    <supports-screen android:largeScreens="${android.largeScreens}"
-                     android:normalScreens="${android.normalScreens}"
-                     android:smallScreens="${android.smallScreens}"
-                     android:anyDensity="${android.anyDensity}"/>
+          android:versionCode="${build}" android:versionName="${version}.${build}" android:installLocation="auto">
 
-    <!--<uses-configuration android:reqTouchScreen="finger"/>-->
-    <!--<uses-configuration android:reqFiveWayNav="false" android:reqTouchScreen="finger"/>-->
-    <!--<uses-configuration android:reqNavigation="true" android:reqTouchScreen="finger"/>-->
+    <uses-sdk android:minSdkVersion="3" android:targetSdkVersion="8"/>
 
-    <uses-sdk android:minSdkVersion="3" android:targetSdkVersion="4"/>
+    <?rb if symbols[:ACRA] ?>
+    <uses-permission android:name="android.permission.INTERNET"></uses-permission>
+    <?rb end ?>
 
-    <!--<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>-->
+    <supports-screen android:largeScreens="${android.largeScreens}" android:normalScreens="${android.normalScreens}"
+                     android:smallScreens="${android.smallScreens}" android:anyDensity="${android.anyDensity}"/>
 
-    <application android:icon="@drawable/icon" android:label="${android.application.name}" android:debuggable="${android.debuggable}">
+    <application <%=app_name%> android:icon="@drawable/icon" android:label="${android.application.name}" android:debuggable="${android.debuggable}">
         <activity android:name="${midlet.classname}" android:label="${android.activity.name}"
                   android:launchMode="singleInstance" android:screenOrientation="${screen_orientation_mode}"
                   android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|fontScale${config_orientation_hook}">
+            <?rb if not symbols[:SKT] ?>
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+            <?rb end ?>
+        </activity>
+        <?rb if symbols[:SKT] ?>
+        <activity android:name="net.intensicode.skt.ArmCheck" android:label="${android.activity.name}"
+                  android:launchMode="singleInstance" android:screenOrientation="${screen_orientation_mode}">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+        <?rb end ?>
     </application>
 </manifest>

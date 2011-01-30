@@ -315,6 +315,25 @@
             @keep_config.proguard
             -keep class * extends javax.microedition.midlet.MIDlet
             -optimizations !code/allocation/variable
+
+# ACRA specifics
+-renamesourcefileattribute SourceFile
+-keepattributes SourceFile,LineNumberTable
+-keepattributes *Annotation*
+-keep class org.acra.ACRA {
+    *;
+}
+-keep class org.acra.ReportingInteractionMode {
+    *;
+}
+-keep public class org.acra.ErrorReporter
+{
+public void addCustomData(java.lang.String,java.lang.String);
+}
+-keep public class org.acra.ErrorReporter
+{
+public org.acra.ErrorReporter$ReportsSenderWorker handleSilentException(java.lang.Throwable);
+}
         </proguard>
     </target>
 
