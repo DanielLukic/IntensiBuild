@@ -40,7 +40,7 @@ ARGV.each do |filename|
         puts
         puts e.backtrace.join("\n")
         puts
-        puts "BUILD FAILED: " + e
+        puts "BUILD FAILED: #{e}"
         system "cat release.log" if File.exist?('release.log')
         exit( 10 )
     end
