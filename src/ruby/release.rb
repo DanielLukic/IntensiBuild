@@ -30,7 +30,7 @@ ARGV.each do |filename|
         puts
         puts e.backtrace.join("\n")
         puts
-        puts "INVALID CONFIGURATION: " + e
+        puts "INVALID CONFIGURATION: #{e}"
         exit( 10 )
     end
 
