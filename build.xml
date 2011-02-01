@@ -8,6 +8,8 @@
     <property file="build.properties"/>
     <property file="env.properties"/>
 
+    <import file="build-hooks.xml"/>
+
     <!-- Set fallback defaults to make IntelliJ happy and have a proper configuration. -->
     <property name="screen.size" value="Default"/>
     <property name="screen.size.suffix" value=""/>
@@ -161,11 +163,8 @@
     </target>
 
     <target name="_update_android_manifest" depends="_make_build_properties" if="android">
-        <copy file="${android.manifest.template}" tofile="${android.manifest.file}.erubis" overwrite="true"/>
-        <replace replacefilterfile="${jad.properties}" file="${android.manifest.file}.erubis"/>
-        <exec executable="erubis" failonerror="true" failifexecutionfails="true" output="${android.manifest.file}">
-            <arg line="--pi ${android.manifest.file}.erubis"/>
-        </exec>
+        <copy file="${android.manifest.template}" tofile="${android.manifest.file}" overwrite="true"/>
+        <replace replacefilterfile="${jad.properties}" file="${android.manifest.file}"/>
     </target>
 
     <target name="_build_android_sources" depends="_init,_update_android_manifest" if="android">
@@ -188,6 +187,7 @@
         </if>
 
         <copy file="${android.manifest.file}" tofile="${dir.build}/AndroidManifest.xml"/>
+        <antcall target="hook-update_android_manifest"/>
 
         <exec executable="${android.aapt}" failonerror="true">
             <arg value="package"/>
