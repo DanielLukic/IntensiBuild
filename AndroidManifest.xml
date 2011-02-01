@@ -21,21 +21,10 @@
         <activity android:name="${midlet.classname}" android:label="${android.activity.name}"
                   android:launchMode="singleInstance" android:screenOrientation="${screen_orientation_mode}"
                   android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|fontScale${config_orientation_hook}">
-            <?rb if not symbols[:SKT] ?>
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-                <category android:name="android.intent.category.LAUNCHER"/>
-            </intent-filter>
-            <?rb end ?>
-        </activity>
-        <?rb if symbols[:SKT] ?>
-        <activity android:name="net.intensicode.skt.ArmCheck" android:label="${android.activity.name}"
-                  android:launchMode="singleInstance" android:screenOrientation="${screen_orientation_mode}">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <?rb end ?>
     </application>
 </manifest>
