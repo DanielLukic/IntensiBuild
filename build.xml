@@ -395,7 +395,7 @@
         <antcall target="-merge-obfuscated-libs"/>
     </target>
 
-    <target name="-merge-obfuscated-libs" if="ADMOB">
+    <target name="-merge-obfuscated-libs">
         <unjar dest="${dir.build.obfuscated}">
             <fileset refid="libraries.android.obfuscated"/>
         </unjar>
