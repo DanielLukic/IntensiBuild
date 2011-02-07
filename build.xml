@@ -188,6 +188,13 @@
         <wtkpreprocess srcdir="${dir.sources}" symbols="${defined_symbols}" destdir="${dir.build.sources}"/>
 
         <if>
+            <isset property="FEINT"/>
+            <then>
+                <wtkpreprocess srcdir="${dir.modules}/OpenFeintAPI" symbols="${defined_symbols}" destdir="${dir.build.sources}"/>
+            </then>
+        </if>
+
+        <if>
             <available file="${dir.sources}-android"/>
             <then>
                 <wtkpreprocess srcdir="${dir.sources}-android" symbols="${defined_symbols}" destdir="${dir.build.sources}" if="android"/>
@@ -201,15 +208,22 @@
             <arg value="package"/>
             <arg value="-v"/>
             <arg value="-m"/>
+            <arg value="--auto-add-overlay"/>
             <arg value="-J"/>
             <arg path="${dir.build.sources}"/>
             <arg value="-M"/>
             <arg path="${dir.build}/AndroidManifest.xml"/>
             <arg value="-S"/>
+            <arg path="${dir.intensibuild}/res/android/standard"/>
+            <arg value="-S"/>
             <arg path="${dir.resources.android}"/>
             <arg value="-I"/>
             <arg path="${android.jar}"/>
         </exec>
+
+        <replace dir="${dir.build.sources}" value="public class R" token="public final class R">
+            <include name="**/R.java"/>
+        </replace>
     </target>
 
     <target name="_build_j2me_sources" depends="_init" if="j2me">
@@ -365,9 +379,12 @@
             }
 
             # ANDROID specifics
+            -optimizationpasses 2
             -dontusemixedcaseclassnames
             -dontskipnonpubliclibraryclasses
             -optimizations !code/simplification/arithmetic,!field/*,!class/merging/*
+            -keep public class * extends android.app.backup.BackupAgentHelper
+            -keep public class * extends android.preference.Preference
             -keep public class * extends android.app.WebView
             -keep public class * extends android.app.Activity
             -keep public class * extends android.app.Application
@@ -521,6 +538,17 @@
                 <include name="${folder.music}/*${target.music_suffix}"/>
             </fileset>
         </copy>
+
+        <if>
+            <isset property="FEINT"/>
+            <then>
+                <copy todir="${dir.build.assets}" overwrite="false" verbose="true">
+                    <fileset dir="${dir.modules}/OpenFeintAPI/assets">
+                        <include name="**/*"/>
+                    </fileset>
+                </copy>
+            </then>
+        </if>
     </target>
 
     <target name="_sign_apk">
@@ -544,8 +572,9 @@
         <!-- This helped: http://asantoso.wordpress.com/2009/09/15/how-to-build-android-application-package-apk-from-the-command-line-using-the-sdk-tools-continuously-integrated-using-cruisecontrol/ -->
         <copy file="${android.manifest.file}" tofile="${dir.build}/AndroidManifest.xml"/>
         <property name="dir.build.res" value="${dir.build}/android_standard_resources"/>
-        <copy todir="${dir.build.res}" verbose="true">
+        <copy todir="${dir.build.res}" verbose="true" overwrite="false">
             <fileset dir="${dir.resources.android}" includes="**/*"/>
+            <fileset dir="${dir.intensibuild}/res/android/standard" includes="**/*"/>
         </copy>
         <copy file="${dir.build.assets}/icon.png" todir="${dir.build.res}/drawable/" overwrite="true"/>
         <exec executable="${android.aapt}">
