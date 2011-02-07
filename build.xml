@@ -335,6 +335,7 @@
             <injar dir="${dir.build.classes}"/>
             <outjar dir="${dir.build.obfuscated}"/>
             <libraryjar>
+                <pathelement path="${android.jar}"/>
                 <pathelement path="${build_libs}"/>
                 <fileset refid="libraries.android.obfuscated"/>
             </libraryjar>
