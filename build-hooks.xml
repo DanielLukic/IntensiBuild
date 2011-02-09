@@ -1,3 +1,4 @@
 <project name="build-hooks">
     <target name="hook-update_android_manifest"/>
+    <target name="hook-post_process_assets"/>
 </project>

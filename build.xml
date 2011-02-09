@@ -549,6 +549,8 @@
                 </copy>
             </then>
         </if>
+
+        <antcall target="hook-post_process_assets"/>
     </target>
 
     <target name="_sign_apk">
