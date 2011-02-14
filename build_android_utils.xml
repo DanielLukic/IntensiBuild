@@ -20,19 +20,19 @@
     <target name="android_init" depends="android_use_emulator,android_choose_package"/>
 
     <target name="android_uninstall" depends="android_init">
-        <exec spawn="false" executable="${android.home}/tools/adb">
+        <exec spawn="false" executable="${android.adb}">
             <arg line="${device-options} uninstall ${midlet.package}"/>
         </exec>
     </target>
 
     <target name="android_install" depends="android_init">
-        <exec spawn="false" executable="${android.home}/tools/adb">
+        <exec spawn="false" executable="${android.adb}">
             <arg line="${device-options} install ${android_default_apk}"/>
         </exec>
     </target>
 
     <target name="android_reinstall" depends="android_init">
-        <exec spawn="false" executable="${android.home}/tools/adb" outputproperty="restart_out">
+        <exec spawn="false" executable="${android.adb}" outputproperty="restart_out">
             <arg line="${device-options} install -r ${android_default_apk}"/>
         </exec>
         <echo message="${restart_out}"/>
@@ -49,7 +49,7 @@
         <exec spawn="false" executable="ruby" outputproperty="android.intent" failonerror="true" failifexecutionfails="true">
             <arg line="${dir.intensibuild}/src/ruby/determine_intent.rb ${android_default_apk}"/>
         </exec>
-        <exec spawn="false" executable="${android.home}/tools/adb">
+        <exec spawn="false" executable="${android.adb}">
             <arg line="${device-options} shell am start -a android.intent.action.MAIN -n ${android.intent}"/>
         </exec>
     </target>
@@ -57,13 +57,13 @@
     <target name="android_restart" depends="android_reinstall,android_start" description="Redeploy and restart application."/>
 
     <target name="android_logcat" depends="android_use_device">
-        <exec spawn="false" executable="${android.home}/tools/adb">
+        <exec spawn="false" executable="${android.adb}">
             <arg line="${device-options} logcat"/>
         </exec>
     </target>
 
     <target name="android_traceview" depends="android_use_device">
-        <exec spawn="false" executable="${android.home}/tools/adb" failonerror="true">
+        <exec spawn="false" executable="${android.adb}" failonerror="true">
             <arg line="${device-options} pull /sdcard/intensigame/calls.trace /tmp/calls.trace"/>
         </exec>
         <exec spawn="false" executable="${android.home}/tools/traceview" failonerror="true">
