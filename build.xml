@@ -116,6 +116,7 @@
         <path refid="classpath.libraries.android"/>
         <pathelement location="${dir.build.classes}"/>
         <pathelement path="${build_libs}"/>
+        <pathelement path="${dir.build.libs.extracted}"/>
         <pathelement location="${android.jar}"/>
     </path>
 
@@ -154,6 +155,9 @@
         <mkdir dir="${dir.build.classes}"/>
         <mkdir dir="${dir.build.obfuscated}"/>
         <mkdir dir="${dir.build.preverified}"/>
+        <mkdir dir="${dir.build.libs}"/>
+        <mkdir dir="${dir.build.libs.extracted}"/>
+        <mkdir dir="${dir.build.libs.unobfuscated}"/>
         <mkdir dir="${dir.release}"/>
         <antcall target="_update_font_sizes"/>
     </target>
@@ -241,7 +245,16 @@
 
     <target name="_build_sources" depends="_build_android_sources,_build_j2me_sources"/>
 
-    <target name="_build_android_classes" depends="_build_sources" if="android">
+    <target name="_extract_ondemand_libs" depends="hook-on_demand_libs">
+        <unjar dest="${dir.build.classes}">
+            <fileset dir="${dir.build.libs}" includes="*.jar"/>
+        </unjar>
+        <unjar dest="${dir.build.libs.extracted}">
+            <fileset dir="${dir.build.libs.unobfuscated}" includes="*.jar"/>
+        </unjar>
+    </target>
+
+    <target name="_build_android_classes" depends="_build_sources,_extract_ondemand_libs" if="android">
         <property name="debug" value="false"/>
         <echo message="Debug? ${debug}"/>
         <javac target="1.5" debug="${debug}" encoding="ascii"
@@ -340,7 +353,7 @@
         </proguard>
     </target>
 
-    <target name="_obfuscate_android" if="android" unless="skip_proguard">
+    <target name="_obfuscate_android"  if="android" unless="skip_proguard">
         <proguard optimize="${optimize}" shrink="${optimize}" defaultpackage=""
                   printmapping="false" verbose="false"
                   usemixedcaseclassnames="${optimize}" obfuscate="${obfuscate}"
@@ -351,6 +364,7 @@
             <libraryjar>
                 <pathelement path="${android.jar}"/>
                 <pathelement path="${build_libs}"/>
+                <pathelement path="${dir.build.libs.extracted}"/>
                 <fileset refid="libraries.android.obfuscated"/>
             </libraryjar>
             <![CDATA[
@@ -416,6 +430,7 @@
     <target name="-merge-obfuscated-libs">
         <unjar dest="${dir.build.obfuscated}">
             <fileset refid="libraries.android.obfuscated"/>
+            <fileset dir="${dir.build.libs.unobfuscated}" includes="*.jar"/>
         </unjar>
     </target>
 
