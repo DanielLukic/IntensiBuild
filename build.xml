@@ -191,12 +191,7 @@
         <wtkpreprocess srcdir="${dir.mod.intensidroid}/${dir.sources}" symbols="${defined_symbols}" destdir="${dir.build.sources}"/>
         <wtkpreprocess srcdir="${dir.sources}" symbols="${defined_symbols}" destdir="${dir.build.sources}"/>
 
-        <if>
-            <isset property="FEINT"/>
-            <then>
-                <wtkpreprocess srcdir="${dir.modules}/OpenFeintAPI" symbols="${defined_symbols}" destdir="${dir.build.sources}"/>
-            </then>
-        </if>
+        <antcall target="hook-preprocess_sources"/>
 
         <if>
             <available file="${dir.sources}-android"/>
@@ -553,17 +548,6 @@
                 <include name="${folder.music}/*${target.music_suffix}"/>
             </fileset>
         </copy>
-
-        <if>
-            <isset property="FEINT"/>
-            <then>
-                <copy todir="${dir.build.assets}" overwrite="false" verbose="true">
-                    <fileset dir="${dir.modules}/OpenFeintAPI/assets">
-                        <include name="**/*"/>
-                    </fileset>
-                </copy>
-            </then>
-        </if>
 
         <antcall target="hook-post_process_assets"/>
     </target>

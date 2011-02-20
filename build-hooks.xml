@@ -1,5 +1,6 @@
 <project name="build-hooks">
-    <target name="hook-on_demand_libs"/>
+    <target name="hook-preprocess_sources"/>
     <target name="hook-update_android_manifest"/>
+    <target name="hook-on_demand_libs"/>
     <target name="hook-post_process_assets"/>
 </project>
