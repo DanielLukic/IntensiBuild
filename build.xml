@@ -430,7 +430,7 @@
     </target>
 
     <target name="_skip_proguard" if="skip_proguard">
-        <copy todir="${dir.build.obfuscated}">
+        <copy todir="${dir.build.obfuscated}" includeemptydirs="false">
             <fileset dir="${dir.build.classes}" includes="**/*"/>
         </copy>
         <antcall target="-merge-obfuscated-libs"/>
@@ -517,31 +517,31 @@
         <echo message="Target resources: ${dir.resources.target}"/>
         <echo message="Platform resources: ${dir.resources.platform}"/>
         <echo message="Root resources: ${dir.resources.root}"/>
-        <copy todir="${dir.build.assets}" overwrite="false" verbose="true">
+        <copy todir="${dir.build.assets}" overwrite="false" verbose="true" includeemptydirs="false">
             <fileset dir="${dir.resources.target}/${screen.size.full.subfolder}">
                 <include name="**/*"/>
             </fileset>
         </copy>
-        <copy todir="${dir.build.assets}" overwrite="false" verbose="true">
+        <copy todir="${dir.build.assets}" overwrite="false" verbose="true" includeemptydirs="false">
             <fileset dir="${dir.resources.target}/${screen.size.full}">
                 <include name="*"/>
             </fileset>
         </copy>
-        <copy todir="${dir.build.assets}" overwrite="false" verbose="true">
+        <copy todir="${dir.build.assets}" overwrite="false" verbose="true" includeemptydirs="false">
             <fileset dir="${dir.resources.target}">
                 <include name="*"/>
                 <include name="${folder.sound}/*${target.sound_suffix}"/>
                 <include name="${folder.music}/*${target.music_suffix}"/>
             </fileset>
         </copy>
-        <copy todir="${dir.build.assets}" overwrite="false" verbose="true">
+        <copy todir="${dir.build.assets}" overwrite="false" verbose="true" includeemptydirs="false">
             <fileset dir="${dir.resources.platform}">
                 <include name="*"/>
                 <include name="${folder.sound}/*${target.sound_suffix}"/>
                 <include name="${folder.music}/*${target.music_suffix}"/>
             </fileset>
         </copy>
-        <copy todir="${dir.build.assets}" overwrite="false" verbose="true">
+        <copy todir="${dir.build.assets}" overwrite="false" verbose="true" includeemptydirs="false">
             <fileset dir="${dir.resources.root}">
                 <include name="*"/>
                 <include name="${folder.sound}/*${target.sound_suffix}"/>
@@ -573,7 +573,7 @@
         <!-- This helped: http://asantoso.wordpress.com/2009/09/15/how-to-build-android-application-package-apk-from-the-command-line-using-the-sdk-tools-continuously-integrated-using-cruisecontrol/ -->
         <copy file="${android.manifest.file}" tofile="${dir.build}/AndroidManifest.xml"/>
         <property name="dir.build.res" value="${dir.build}/android_standard_resources"/>
-        <copy todir="${dir.build.res}" verbose="true" overwrite="false">
+        <copy todir="${dir.build.res}" verbose="true" overwrite="false" includeemptydirs="false">
             <fileset dir="${dir.resources.android}" includes="**/*"/>
             <fileset dir="${dir.intensibuild}/res/android/standard" includes="**/*"/>
         </copy>
@@ -717,7 +717,7 @@
 
     <target name="release" depends="version:bump:date,version:bump:build,rebuild"
             description="Build the system in release mode.">
-        <copy todir="${dir.release}" verbose="false">
+        <copy todir="${dir.release}" verbose="false" includeemptydirs="false">
             <fileset dir="${dir.build.dist}"/>
         </copy>
     </target>
