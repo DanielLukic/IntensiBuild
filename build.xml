@@ -203,6 +203,12 @@
         <copy file="${android.manifest.file}" tofile="${dir.build}/AndroidManifest.xml"/>
         <antcall target="hook-update_android_manifest"/>
 
+        <copy todir="${dir.build.res}" verbose="true" overwrite="false" includeemptydirs="false">
+            <fileset dir="${dir.resources.android}" includes="**/*"/>
+            <fileset dir="${dir.intensibuild}/res/android/standard" includes="**/*"/>
+        </copy>
+        <antcall target="hook-post_process_resources"/>
+
         <exec executable="${android.aapt}" failonerror="true">
             <arg value="package"/>
             <arg value="-v"/>
@@ -215,7 +221,7 @@
             <arg value="-S"/>
             <arg path="${dir.intensibuild}/res/android/standard"/>
             <arg value="-S"/>
-            <arg path="${dir.resources.android}"/>
+            <arg path="${dir.build.res}"/>
             <arg value="-I"/>
             <arg path="${android.jar}"/>
         </exec>
@@ -572,11 +578,7 @@
     <target name="_package_android" depends="_collect_assets,_build_native_libs" if="android">
         <!-- This helped: http://asantoso.wordpress.com/2009/09/15/how-to-build-android-application-package-apk-from-the-command-line-using-the-sdk-tools-continuously-integrated-using-cruisecontrol/ -->
         <copy file="${android.manifest.file}" tofile="${dir.build}/AndroidManifest.xml"/>
-        <property name="dir.build.res" value="${dir.build}/android_standard_resources"/>
-        <copy todir="${dir.build.res}" verbose="true" overwrite="false" includeemptydirs="false">
-            <fileset dir="${dir.resources.android}" includes="**/*"/>
-            <fileset dir="${dir.intensibuild}/res/android/standard" includes="**/*"/>
-        </copy>
+
         <copy file="${dir.build.assets}/icon.png" todir="${dir.build.res}/drawable/" overwrite="true"/>
         <exec executable="${android.aapt}">
             <arg value="package"/>
