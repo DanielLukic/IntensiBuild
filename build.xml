@@ -357,7 +357,7 @@
     </target>
 
     <target name="_obfuscate_android"  if="android" unless="skip_proguard">
-        <copy file="${dir.intensibuild}/android_proguard.conf" todir="${dir.build}" failonerror="true" verbose="true"/>
+        <copy file="${dir.intensibuild}/android_proguard.conf" tofile="${dir.build}/proguard.conf" failonerror="true" verbose="true"/>
         <antcall target="hook-prepare_proguard_config"/>
         <proguard optimize="${optimize}" shrink="${optimize}" obfuscate="${obfuscate}"
                   printmapping="false" verbose="false" printseeds="false" microedition="false">
