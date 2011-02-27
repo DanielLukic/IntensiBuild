@@ -55,9 +55,6 @@
 
     <path id="aspectj.antlibs">
         <pathelement path="${dir.environment}/aspectj/lib/aspectjtools.jar"/>
-        <!--<pathelement path="${dir.environment}/aspectj/lib/aspectjrt.jar"/>-->
-        <!--<pathelement path="${dir.environment}/aspectj/lib/aspectjweaver.jar"/>-->
-        <!--<pathelement path="${dir.environment}/aspectj/lib/org.aspectj.matcher.jar"/>-->
     </path>
 
     <taskdef resource="org/aspectj/tools/ant/taskdefs/aspectjTaskdefs.properties" classpathref="aspectj.antlibs"/>
@@ -282,7 +279,12 @@
         <move file="${dir.build}/aop" tofile="${dir.build.classes}"/>
     </target>
 
-    <target name="_build_classes" depends="_build_j2me_classes,_build_android_classes,_interweave_timing"/>
+    <target name="_interweave_aspects">
+        <antcall target="_interweave_timing"/>
+        <antcall target="hook-interweave_aspects"/>
+    </target>
+
+    <target name="_build_classes" depends="_build_j2me_classes,_build_android_classes,_interweave_aspects"/>
 
     <target name="_build_release" depends="_init">
         <echo message="Building releases: ${release.configurations}"/>
