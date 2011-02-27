@@ -1,6 +1,7 @@
 <project name="build-hooks">
     <target name="hook-preprocess_sources"/>
     <target name="hook-interweave_aspects"/>
+    <target name="hook-prepare_proguard_config"/>
     <target name="hook-update_android_manifest"/>
     <target name="hook-on_demand_libs"/>
     <target name="hook-post_process_resources"/>

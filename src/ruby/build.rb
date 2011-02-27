@@ -89,8 +89,8 @@ def write_release_properties( config, target, screen_size )
       config.keep.each do |classname_with_package|
         file.puts "-keep class * extends #{classname_with_package}"
         file.puts "-keep class #{classname_with_package} { public static <fields>; }"
-        file.puts "-keep class net.intensicode.IntensiApp"
       end
+      file.puts "-keep class net.intensicode.IntensiApp"
     end
 
     template_filepath = File.join( File.dirname( $0 ), 'release_template.erb' )
