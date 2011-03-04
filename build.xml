@@ -167,8 +167,8 @@
     <target name="_make_build_properties">
         <property file="version.properties"/>
         <echoproperties destfile="${jad.properties}" failonerror="true"/>
-        <replaceregexp byline="true" file="${jad.properties}" match="(.*)=(.*)" replace="{\1}=\2"/>
-        <replaceregexp byline="true" file="${jad.properties}" match="(.*)=(.*)" replace="$\1=\2"/>
+        <replaceregexp byline="true" file="${jad.properties}" match="([^=]*)=(.*)" replace="{\1}=\2"/>
+        <replaceregexp byline="true" file="${jad.properties}" match="([^=]*)=(.*)" replace="$\1=\2"/>
     </target>
 
     <target name="_update_android_manifest" depends="_make_build_properties" if="android">
