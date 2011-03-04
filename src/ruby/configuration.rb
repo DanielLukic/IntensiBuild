@@ -26,27 +26,31 @@ class Configuration
       @properties[property_name]
     end
 
-    def override_property( properties_hash )
+    def set_property( properties_hash )
       properties_hash.each do |key,value|
         @properties[key] = value
       end
+    end
+
+    def clear_property( *names )
+      names.each {|name| @properties.delete(name)}
     end
 
     def screen_orientation(mode_id)
       @symbols.delete :ORIENTATION_DYNAMIC
       @symbols.delete :ORIENTATION_PORTRAIT
       @symbols.delete :ORIENTATION_LANDSCAPE
-      override_property 'config_orientation_hook' => ''
-      override_property 'screen_orientation_mode' => 'unspecified'
+      set_property 'config_orientation_hook' => ''
+      set_property 'screen_orientation_mode' => 'unspecified'
       if mode_id == :dynamic
-        override_property 'config_orientation_hook' => '|orientation'
-        override_property 'screen_orientation_mode' => 'unspecified'
+        set_property 'config_orientation_hook' => '|orientation'
+        set_property 'screen_orientation_mode' => 'unspecified'
         @symbols << :ORIENTATION_DYNAMIC
       elsif mode_id == :landscape
-        override_property 'screen_orientation_mode' => 'landscape'
+        set_property 'screen_orientation_mode' => 'landscape'
         @symbols << :ORIENTATION_LANDSCAPE
       elsif mode_id == :portrait
-        override_property 'screen_orientation_mode' => 'portrait'
+        set_property 'screen_orientation_mode' => 'portrait'
         @symbols << :ORIENTATION_PORTRAIT
       end
     end
