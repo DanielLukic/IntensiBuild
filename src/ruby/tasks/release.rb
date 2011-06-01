@@ -1,5 +1,5 @@
 
-desc "Build a specific release or the first configuration matching config/*240x320*.config."
+desc "Build a specific release."
 task :release, :configuration, :needs => 'resources:font_size_files' do |task, args|
   configurations = args[:configuration]
   configurations ||= default_configuration
@@ -15,7 +15,7 @@ namespace :release do
   end
 
   def default_configuration
-    all_configurations.select {|c| c =~ /240x320/}.first
+    raise "please specify which configuration to release"
   end
 
   def release(configurations)
