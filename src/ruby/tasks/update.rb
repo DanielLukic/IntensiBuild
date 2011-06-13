@@ -66,12 +66,31 @@ namespace :update do
 
       require 'net/ftp'
       Net::FTP.open(@ftp_host) do |ftp|
+        ftp.debug_mode = true
+        ftp.passive = true
         ftp.login @ftp_user, @ftp_password
+        ftp.mkdir @ftp_folder rescue nil
         ftp.chdir @ftp_folder
+
         Dir.glob("deploy/update/#{package}.*").each do |file_path|
-          puts "uploading #{File.basename(file_path)}"
-          ftp.putbinaryfile file_path
+           base_path = File.basename(file_path)
+           puts "moving out #{base_path}"
+           ftp.delete base_path + ".bak" rescue nil
+           ftp.rename base_path, base_path + ".bak" rescue nil
+         end
+
+        Dir.glob("deploy/update/#{package}.*").each do |file_path|
+           base_path = File.basename(file_path)
+           puts "uploading #{base_path}"
+           ftp.putbinaryfile file_path, base_path + ".new"
         end
+
+        Dir.glob("deploy/update/#{package}.*").each do |file_path|
+          base_path = File.basename(file_path)
+          puts "moving in #{base_path}"
+          ftp.rename base_path + ".new", base_path
+        end
+
       end
 
     end
