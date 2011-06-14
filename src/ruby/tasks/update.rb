@@ -66,7 +66,6 @@ namespace :update do
 
       require 'net/ftp'
       Net::FTP.open(@ftp_host) do |ftp|
-        ftp.debug_mode = true
         ftp.passive = true
         ftp.login @ftp_user, @ftp_password
         ftp.mkdir @ftp_folder rescue nil
