@@ -8,7 +8,7 @@
                      android:smallScreens="${android.smallScreens}" android:anyDensity="${android.anyDensity}"/>
 
     <application android:icon="@drawable/icon" android:label="${android.application.name}" android:debuggable="${android.debuggable}"
-            android:name="${android_app_class}">
+                 android:name="${android_app_class}">
         <activity android:name="${midlet.classname}" android:label="${android.activity.name}"
                   android:launchMode="singleInstance" android:screenOrientation="${screen_orientation_mode}"
                   android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|fontScale${config_orientation_hook}">
