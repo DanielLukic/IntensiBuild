@@ -45,7 +45,7 @@ namespace :update do
       Dir.glob("update/#{package}.*").each do |template_path|
         result = templater.process(template_path)
         writer.process(template_path, result)
-        result = ERB.new(File.read(template_path)).result(data.binding)
+        result = ERB.new(File.read(template_path)).result(data.context)
         target_path = "deploy/update/#{File.basename(template_path)}"
         File.open(target_path, "w") { |file| file.write(result) }
         puts "erb'd #{template_path} to #{target_path}"
@@ -57,7 +57,7 @@ namespace :update do
         next if File.exist?(check_name)
 
         default_path = "update/default" + extension
-        result = ERB.new(File.read(default_path)).result(data.binding)
+        result = ERB.new(File.read(default_path)).result(data.context)
 
         target_path = "deploy/#{check_name}"
         File.open(target_path, "w") { |file| file.write(result) }

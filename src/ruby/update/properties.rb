@@ -14,8 +14,8 @@ class Properties
         hash.each { |k,v| @data[_(k)] = v }
     end
 
-    def binding
-        Kernel.binding
+    def context
+        binding
     end
 
     def [](key)
