@@ -15,6 +15,12 @@ namespace :update do
   def update(configurations)
     configurations.each do |config|
       puts "updating #{config}"
+
+      require 'fileutils'
+
+      FileUtils.rm_rf 'deploy/update' rescue nil
+      FileUtils.mkdir 'deploy/update' rescue nil
+
       build_release config
       run "mkdir -p deploy/update"
       require 'update/properties'
@@ -34,11 +40,6 @@ namespace :update do
       puts "package is #{package}"
       puts "update url is #{data['update_url']}"
       puts "update folder is #{data['update_folder']}"
-
-      require 'fileutils'
-
-      FileUtils.rm_rf 'deploy/update/*' rescue nil
-      FileUtils.mkdir 'deploy/update/' rescue nil
 
       require 'erb'
 
